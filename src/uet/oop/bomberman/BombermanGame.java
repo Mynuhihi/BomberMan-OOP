@@ -7,14 +7,14 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
-import uet.oop.bomberman.entities.Bomber;
-import uet.oop.bomberman.entities.Entity;
-import uet.oop.bomberman.entities.Grass;
-import uet.oop.bomberman.entities.Wall;
+import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class BombermanGame extends Application {
     
@@ -57,21 +57,35 @@ public class BombermanGame extends Application {
         };
         timer.start();
 
-        createMap();
+        try {
+            createMap("res/levels/Level1.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage());
+        Entity bomberman = new Bomber(1.5, 1, Sprite.player_right.getFxImage());
         entities.add(bomberman);
     }
 
-    public void createMap() {
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
+    public void createMap(String path) throws FileNotFoundException {
+        FileInputStream reader = new FileInputStream(path);
+        Scanner scanner = new Scanner(reader);
+        int level = scanner.nextInt();
+        int row = scanner.nextInt();
+        int col = scanner.nextInt();
+        String line = scanner.nextLine();
+
+        for (int i = 0; i < row; i++) {
+            line = scanner.nextLine();
+            for (int j = 0; j < col; j++) {
                 Entity object;
-                if (j == 0 || j == HEIGHT - 1 || i == 0 || i == WIDTH - 1) {
-                    object = new Wall(i, j, Sprite.wall.getFxImage());
+                if (line.charAt(j) == '#') {
+                    object = new Wall(j, i, Sprite.wall.getFxImage());
                 }
-                else {
-                    object = new Grass(i, j, Sprite.grass.getFxImage());
+                else if (line.charAt(j) == '*') {
+                    object = new Brick(j, i, Sprite.brick.getFxImage());
+                } else {
+                    object = new Grass(j, i, Sprite.grass.getFxImage());
                 }
                 stillObjects.add(object);
             }
