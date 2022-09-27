@@ -32,4 +32,21 @@ public class Bomber extends Entity {
     public void setSpeed(double speed) {
         this.speed = speed;
     }
+
+    public void moveLeft() {
+
+    }
+
+    public void moveRight() {
+
+    }
+
+    public void moveUp() {
+
+    }
+
+    public void moveDown() {
+
+    }
+
 }
