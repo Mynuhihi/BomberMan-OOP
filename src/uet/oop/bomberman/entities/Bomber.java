@@ -1,52 +1,72 @@
 package uet.oop.bomberman.entities;
 
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import uet.oop.bomberman.graphics.Sprite;
 
 public class Bomber extends Entity {
-    private double directionX = 0;
-    private double directionY = 0;
-    private double speed = 1.5;
+    static class Move {
+        private boolean up = false;
+        private boolean down = false;
+        private boolean left = false;
+        private boolean right = false;
+    }
+
+    private final Move move = new Move();
+    private double speedItemBuff;
+    private int animate = 0;
 
     public Bomber(double x, double y, Image img) {
         super(x, y, img);
+        width = Sprite.SCALED_SIZE * 0.75;
+        speedItemBuff = 1;
     }
 
     @Override
     public void update() {
-        x += directionX * speed;
-        y += directionY * speed;
+        animate++;
+        double speed = 0.8 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
+        if (move.up) {
+            y -= speed * speedItemBuff;
+            img = Sprite.movingSprite(Sprite.player_up, Sprite.player_up_1, Sprite.player_up_2, animate, 18).getFxImage();
+        }
+        if (move.down) {
+            y += speed * speedItemBuff;
+            img = Sprite.movingSprite(Sprite.player_down, Sprite.player_down_1, Sprite.player_down_2, animate, 18).getFxImage();
+        }
+        if (move.left) {
+            x -= speed * speedItemBuff;
+            img = Sprite.movingSprite(Sprite.player_left, Sprite.player_left_1, Sprite.player_left_2, animate, 18).getFxImage();
+        }
+        if (move.right) {
+            x += speed * speedItemBuff;
+            img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, animate, 18).getFxImage();
+        }
     }
 
-    public void setDirectionX(double directionX) {
-        this.directionX = directionX;
-    }
-
-    public void setDirectionY(double directionY) {
-        this.directionY = directionY;
-    }
-
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-
-    public void moveLeft() {
-
-    }
-
-    public void moveRight() {
-
-    }
-
-    public void moveUp() {
+    @Override
+    public void handleCollision(Entity other) {
 
     }
 
-    public void moveDown() {
-
+    public void addControl(Scene scene) {
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.W) move.up = true;
+            if (event.getCode() == KeyCode.S) move.down = true;
+            if (event.getCode() == KeyCode.A) move.left = true;
+            if (event.getCode() == KeyCode.D) move.right = true;
+        });
+        scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            if (event.getCode() == KeyCode.W) move.up = false;
+            if (event.getCode() == KeyCode.S) move.down = false;
+            if (event.getCode() == KeyCode.A) move.left = false;
+            if (event.getCode() == KeyCode.D) move.right = false;
+        });
     }
 
+    public void setSpeedItemBuff(double speedItemBuff) {
+        this.speedItemBuff = speedItemBuff;
+    }
 }

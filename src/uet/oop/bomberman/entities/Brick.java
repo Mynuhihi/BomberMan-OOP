@@ -11,4 +11,9 @@ public class Brick extends Entity {
     public void update() {
 
     }
+
+    @Override
+    public void handleCollision(Entity other) {
+
+    }
 }

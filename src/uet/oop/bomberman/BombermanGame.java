@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
@@ -18,8 +19,10 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BombermanGame extends Application {
-    public static final int WIDTH = 20;
-    public static final int HEIGHT = 15;
+    public static final int WIDTH = 31;
+    public static final int HEIGHT = 13;
+    public static final double STAGE_WIDTH = 16 * Sprite.SCALED_SIZE;
+    public static final double STAGE_HEIGHT = 13 * Sprite.SCALED_SIZE + 47;
 
     private GraphicsContext gc;
     private Canvas canvas;
@@ -47,6 +50,11 @@ public class BombermanGame extends Application {
 
         // Them scene vao stage
         stage.setScene(scene);
+
+        stage.setTitle("BombermanGame");
+        stage.setWidth(STAGE_WIDTH);
+        stage.setHeight(STAGE_HEIGHT);
+        stage.getIcons().add(Sprite.balloom_left1.getFxImage());
         stage.show();
 
         AnimationTimer timer = new AnimationTimer() {
@@ -54,6 +62,7 @@ public class BombermanGame extends Application {
             public void handle(long l) {
                 render();
                 update();
+                checkAllCollisions();
             }
         };
         timer.start();
@@ -64,21 +73,16 @@ public class BombermanGame extends Application {
             e.printStackTrace();
         }
 
-        Bomber bomberman = new Bomber(1.5, 1, Sprite.player_right.getFxImage());
+        //Bomber
+        Bomber bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage());
         entities.add(bomberman);
 
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.W) bomberman.setDirectionY(-1);
-            if (event.getCode() == KeyCode.S) bomberman.setDirectionY(1);
-            if (event.getCode() == KeyCode.A) bomberman.setDirectionX(-1);
-            if (event.getCode() == KeyCode.D) bomberman.setDirectionX(1);
-        });
+        bomberman.addControl(scene);
 
-        scene.setOnKeyReleased(event -> {
-            if (event.getCode() == KeyCode.W) bomberman.setDirectionY(0);
-            if (event.getCode() == KeyCode.S) bomberman.setDirectionY(0);
-            if (event.getCode() == KeyCode.A) bomberman.setDirectionX(0);
-            if (event.getCode() == KeyCode.D) bomberman.setDirectionX(0);
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                System.exit(0);
+            }
         });
     }
 
@@ -106,6 +110,21 @@ public class BombermanGame extends Application {
         }
 
         scanner.close();
+    }
+
+    public void checkAllCollisions() {
+        for (Entity entity : stillObjects) {
+            if (entity instanceof Wall) {
+                Wall wall = (Wall) entity;
+                for (Entity e : entities)
+                    wall.checkCollision(e, true);
+            }
+            if (entity instanceof Brick) {
+                Brick brick = (Brick) entity;
+                for (Entity e : entities)
+                    brick.checkCollision(e, true);
+            }
+        }
     }
 
     public void update() {
