@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class BombermanGame extends Application {
+public class BombermanGame extends Application{
+    //kich thuoc stage
     public static final int WIDTH = 31;
     public static final int HEIGHT = 13;
     public static final double STAGE_WIDTH = 16 * Sprite.SCALED_SIZE;
@@ -26,8 +27,9 @@ public class BombermanGame extends Application {
 
     private GraphicsContext gc;
     private Canvas canvas;
-    private List<Entity> entities = new ArrayList<>();
-    private List<Entity> stillObjects = new ArrayList<>();
+    private static List<Entity> entities = new ArrayList<>();
+    private static List<Entity> stillObjects = new ArrayList<>();
+    private static List<Entity> bombLists = new ArrayList<>();
 
     private String level = "res/levels/Level1.txt";
 
@@ -136,4 +138,17 @@ public class BombermanGame extends Application {
         stillObjects.forEach(g -> g.render(gc));
         entities.forEach(g -> g.render(gc));
     }
+
+    public static List<Entity> getStillObjects() {
+        return stillObjects;
+    }
+
+    public static List<Entity> getEntities() {
+        return entities;
+    }
+
+    public static List<Entity> getBombLists() {
+        return bombLists;
+    }
+
 }

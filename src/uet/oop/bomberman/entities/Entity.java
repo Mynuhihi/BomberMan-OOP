@@ -49,4 +49,10 @@ public abstract class Entity {
             other.handleCollision(this);
         }
     }
+    public int getXTile() {
+        return (int) ((x + Sprite.SCALED_SIZE / 2) / Sprite.SCALED_SIZE);
+    }
+    public  int getYTile() {
+        return (int) ((y + Sprite.SCALED_SIZE / 2) / Sprite.SCALED_SIZE);
+    }
 }
