@@ -14,7 +14,7 @@ public class Bomber extends Entity {
         private boolean right = false;
     }
 
-    private final Move move = new Move();
+    private Move move = new Move();
     private double speedItemBuff;
     private int animate = 0;
 
@@ -64,9 +64,5 @@ public class Bomber extends Entity {
             if (event.getCode() == KeyCode.A) move.left = false;
             if (event.getCode() == KeyCode.D) move.right = false;
         });
-    }
-
-    public void setSpeedItemBuff(double speedItemBuff) {
-        this.speedItemBuff = speedItemBuff;
     }
 }
