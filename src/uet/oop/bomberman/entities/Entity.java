@@ -4,6 +4,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import uet.oop.bomberman.graphics.Sprite;
 
+import java.util.Objects;
+
 public abstract class Entity {
     //Tọa độ X tính từ góc trái trên trong Canvas
     protected double x;
@@ -21,6 +23,10 @@ public abstract class Entity {
         width = Sprite.SCALED_SIZE;
         height = Sprite.SCALED_SIZE;
         this.img = img;
+    }
+
+    public Entity() {
+
     }
 
     public void render(GraphicsContext gc) {
@@ -49,6 +55,15 @@ public abstract class Entity {
             other.handleCollision(this);
         }
     }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
     public int getXTile() {
         return (int) ((x + Sprite.SCALED_SIZE / 2) / Sprite.SCALED_SIZE);
     }
