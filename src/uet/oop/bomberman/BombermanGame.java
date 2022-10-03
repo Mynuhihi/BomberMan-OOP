@@ -28,9 +28,10 @@ public class BombermanGame extends Application {
 
     private GraphicsContext gc;
     private Canvas canvas;
-    public static List<Entity> killableEntities = new ArrayList<>();
-    public List<Entity> grasses = new ArrayList<>();
-    public List<Entity> blockingEntities = new ArrayList<>();
+    private static List<Entity> killableEntities = new ArrayList<>();
+    private static List<Entity> grasses = new ArrayList<>();
+    private static List<Entity> blockingEntities = new ArrayList<>();
+    private static List<Entity> bombLists = new ArrayList<>();
 
     private String level = "res/levels/Level1.txt";
 
@@ -139,6 +140,18 @@ public class BombermanGame extends Application {
         grasses.forEach(g -> g.render(gc));
         blockingEntities.forEach(g -> g.render(gc));
         killableEntities.forEach(g -> g.render(gc));
+    }
+
+    public static List<Entity> getStillObjects() {
+        return stillObjects;
+    }
+
+    public static List<Entity> getEntities() {
+        return entities;
+    }
+
+    public static List<Entity> getBombLists() {
+        return bombLists;
     }
 
     public static Entity getBomber() {

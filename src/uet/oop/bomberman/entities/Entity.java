@@ -56,6 +56,14 @@ public abstract class Entity {
         }
     }
 
+    public int getXTile() {
+        return (int) ((x + Sprite.SCALED_SIZE / 2) / Sprite.SCALED_SIZE);
+    }
+
+    public  int getYTile() {
+        return (int) ((y + Sprite.SCALED_SIZE / 2) / Sprite.SCALED_SIZE);
+    }
+
     public double getX() {
         return x;
     }

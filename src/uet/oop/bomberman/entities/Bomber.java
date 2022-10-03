@@ -18,6 +18,8 @@ public class Bomber extends Entity {
         private boolean down = false;
         private boolean left = false;
         private boolean right = false;
+
+        private boolean check = false;
     }
 
     private BOMBER_STATUS status = BOMBER_STATUS.SPAWN;
@@ -65,6 +67,11 @@ public class Bomber extends Entity {
             if (move.down) y += speed * speedItemBuff;
             if (move.left) x -= speed * speedItemBuff;
             if (move.right) x += speed * speedItemBuff;
+            if (move.check) {
+                Bomb bomb = new Bomb(getXTile(), getYTile(), Sprite.bomb.getFxImage());
+                bomb.check = true;
+                BombermanGame.getBombLists().add(bomb);
+            }
         } else if (status == BOMBER_STATUS.KILLED) {
             if (animate >= 24) respawn();
         }
@@ -83,12 +90,14 @@ public class Bomber extends Entity {
             if (event.getCode() == KeyCode.S) move.down = true;
             if (event.getCode() == KeyCode.A) move.left = true;
             if (event.getCode() == KeyCode.D) move.right = true;
+            if (event.getCode() == KeyCode.SPACE) move.check = true;
         });
         scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyCode.W) move.up = false;
             if (event.getCode() == KeyCode.S) move.down = false;
             if (event.getCode() == KeyCode.A) move.left = false;
             if (event.getCode() == KeyCode.D) move.right = false;
+            if (event.getCode() == KeyCode.SPACE) move.check = false;
             if (event.getCode() == KeyCode.R) kill();
         });
     }
@@ -101,8 +110,12 @@ public class Bomber extends Entity {
     public void respawn() {
         status = BOMBER_STATUS.SPAWN;
         animate = 0;
-        x = Sprite.SCALED_SIZE;
-        y = Sprite.SCALED_SIZE;
+
+        int randomX = 1 + (int) (Math.random() * 1000) % 29;
+        int randomY = 1 + (int) (Math.random() * 1000) % 11;
+
+        x = Sprite.SCALED_SIZE * randomX;
+        y = Sprite.SCALED_SIZE * randomY;
         lives --;
         //if (lives == 0) dead();
     }

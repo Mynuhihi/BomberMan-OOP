@@ -8,7 +8,6 @@ import uet.oop.bomberman.graphics.Sprite;
 
 public class Balloom extends Enemy {
     public static final int ANIMATE_TIME = 36;
-    private int animate = 0;
     private int changeDirectionTime = 120;
 
     public Balloom(double x, double y) {

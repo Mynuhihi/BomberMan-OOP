@@ -7,6 +7,7 @@ import uet.oop.bomberman.graphics.Sprite;
 
 public class Oneal extends Enemy {
     private static final int ANIMATE_TIME = 36;
+    private int changeDirectionTime = 120;
 
     public Oneal(double x, double y) {
         super(x, y);
@@ -37,9 +38,10 @@ public class Oneal extends Enemy {
         animate++;
 
         if (status == ENEMY_STATUS.ACTIVE) {
-            if (animate >= 120) {
+            if (animate >= changeDirectionTime) {
                 direction = calculateDirection();
                 animate = 0;
+                changeDirectionTime = 60 + (int) (Math.random() * 1000) % 120;
             }
             move();
         } else if (status == ENEMY_STATUS.KILLED) {
