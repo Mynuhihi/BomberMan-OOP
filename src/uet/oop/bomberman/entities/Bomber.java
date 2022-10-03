@@ -5,7 +5,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+
 import uet.oop.bomberman.entities.enemy.Enemy;
+import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.graphics.Sprite;
 
 public class Bomber extends Entity {
@@ -18,7 +20,6 @@ public class Bomber extends Entity {
         private boolean down = false;
         private boolean left = false;
         private boolean right = false;
-
         private boolean check = false;
     }
 
@@ -74,6 +75,11 @@ public class Bomber extends Entity {
             }
         } else if (status == BOMBER_STATUS.KILLED) {
             if (animate >= 24) respawn();
+        }
+        if (move.check) {
+            Bomb bomb = new Bomb(getXTile(), getYTile(), Sprite.bomb.getFxImage());
+            bomb.check = true;
+            BombermanGame.getBombLists().add(bomb);
         }
     }
 

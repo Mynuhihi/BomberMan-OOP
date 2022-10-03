@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class BombermanGame extends Application {
+public class BombermanGame extends Application{
+    //kich thuoc stage
     public static final int WIDTH = 31;
     public static final int HEIGHT = 13;
     public static final double STAGE_WIDTH = 16 * Sprite.SCALED_SIZE;
@@ -28,9 +29,10 @@ public class BombermanGame extends Application {
 
     private GraphicsContext gc;
     private Canvas canvas;
+
     private static List<Entity> killableEntities = new ArrayList<>();
     private static List<Entity> grasses = new ArrayList<>();
-    private static List<Entity> blockingEntities = new ArrayList<>();
+    private static List<Entity> blockingEntities = new ArrayList<>(
     private static List<Entity> bombLists = new ArrayList<>();
 
     private String level = "res/levels/Level1.txt";
@@ -137,9 +139,14 @@ public class BombermanGame extends Application {
 
     public void render() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
         grasses.forEach(g -> g.render(gc));
         blockingEntities.forEach(g -> g.render(gc));
         killableEntities.forEach(g -> g.render(gc));
+        for (Entity entity : bombLists) {
+            entities.add(entity);
+        }
+        bombLists.clear();
     }
 
     public static List<Entity> getStillObjects() {
@@ -157,4 +164,5 @@ public class BombermanGame extends Application {
     public static Entity getBomber() {
         return killableEntities.get(0);
     }
+
 }
