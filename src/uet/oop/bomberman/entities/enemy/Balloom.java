@@ -1,7 +1,6 @@
 package uet.oop.bomberman.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
-import uet.oop.bomberman.entities.Bomber;
 import uet.oop.bomberman.entities.Brick;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Wall;
@@ -19,9 +18,15 @@ public class Balloom extends Enemy {
     @Override
     public void render(GraphicsContext gc) {
         if (status == ENEMY_STATUS.ACTIVE) {
-            if (direction == ENEMY_DIRECTION.LEFT || direction == ENEMY_DIRECTION.UP)
+            if (direction == ENEMY_DIRECTION.UP_LEFT
+                    || direction == ENEMY_DIRECTION.DOWN_LEFT
+                    || direction == ENEMY_DIRECTION.UP
+                    || direction == ENEMY_DIRECTION.LEFT)
                 img = Sprite.movingSprite(Sprite.balloom_left1, Sprite.balloom_left2, Sprite.balloom_left3, Sprite.balloom_left2, animate, ANIMATE_TIME).getFxImage();
-            if (direction == ENEMY_DIRECTION.RIGHT || direction == ENEMY_DIRECTION.DOWN)
+            if (direction == ENEMY_DIRECTION.UP_RIGHT
+                    || direction == ENEMY_DIRECTION.DOWN_RIGHT
+                    || direction == ENEMY_DIRECTION.DOWN
+                    || direction == ENEMY_DIRECTION.RIGHT)
                 img = Sprite.movingSprite(Sprite.balloom_right1, Sprite.balloom_right2, Sprite.balloom_right3, Sprite.balloom_right2, animate, ANIMATE_TIME).getFxImage();
             super.render(gc);
         } else if (status == ENEMY_STATUS.KILLED) {
@@ -33,12 +38,12 @@ public class Balloom extends Enemy {
     @Override
     public void update() {
         animate++;
-        if (animate >= 60000) animate = 0;
 
         if (status == ENEMY_STATUS.ACTIVE) {
             if (animate >= changeDirectionTime) {
-                calculateDirection();
+                direction = calculateRandomDirection();
                 animate = 0;
+                changeDirectionTime = 60 + (int) (Math.random() * 1000) % 120;
             }
             move();
         } else if (status == ENEMY_STATUS.KILLED) {
@@ -49,18 +54,13 @@ public class Balloom extends Enemy {
     @Override
     public void handleCollision(Entity other) {
         if (status == ENEMY_STATUS.ACTIVE) {
-            if (other instanceof Wall || other instanceof Brick) calculateDirection();
-            if (other instanceof Bomber) kill();
+            if (other instanceof Wall || other instanceof Brick) {
+                if (direction == ENEMY_DIRECTION.UP
+                        || direction == ENEMY_DIRECTION.DOWN
+                        || direction == ENEMY_DIRECTION.LEFT
+                        || direction == ENEMY_DIRECTION.RIGHT)
+                    direction = calculateRandomDirection();
+            }
         }
-    }
-
-    public void calculateDirection() {
-        int calc = (int) (Math.round(Math.random() * 1000)) % 4;
-        if (calc == 0) direction = ENEMY_DIRECTION.UP;
-        else if (calc == 1) direction = ENEMY_DIRECTION.DOWN;
-        else if (calc == 2) direction = ENEMY_DIRECTION.LEFT;
-        else if (calc == 3) direction = ENEMY_DIRECTION.RIGHT;
-
-        changeDirectionTime = 60 + (int) (Math.round(Math.random() * 1000)) % 120;
     }
 }

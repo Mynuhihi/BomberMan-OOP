@@ -28,7 +28,7 @@ public class BombermanGame extends Application {
 
     private GraphicsContext gc;
     private Canvas canvas;
-    public List<Entity> killableEntities = new ArrayList<>();
+    public static List<Entity> killableEntities = new ArrayList<>();
     public List<Entity> grasses = new ArrayList<>();
     public List<Entity> blockingEntities = new ArrayList<>();
 
@@ -139,5 +139,9 @@ public class BombermanGame extends Application {
         grasses.forEach(g -> g.render(gc));
         blockingEntities.forEach(g -> g.render(gc));
         killableEntities.forEach(g -> g.render(gc));
+    }
+
+    public static Entity getBomber() {
+        return killableEntities.get(0);
     }
 }

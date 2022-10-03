@@ -20,6 +20,8 @@ public class Sprite {
 	protected int _realHeight;
 	private SpriteSheet _sheet;
 
+	public static Sprite blank = new Sprite(DEFAULT_SIZE, 15, 15, SpriteSheet.tiles, 16, 16);
+
 	/*
 	|--------------------------------------------------------------------------
 	| Board sprites

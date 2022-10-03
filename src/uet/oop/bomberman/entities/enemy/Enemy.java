@@ -1,12 +1,14 @@
 package uet.oop.bomberman.entities.enemy;
 
-import javafx.scene.image.Image;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
 
+import static uet.oop.bomberman.entities.enemy.Enemy.ENEMY_DIRECTION.LEFT;
+import static uet.oop.bomberman.entities.enemy.Enemy.ENEMY_DIRECTION.UP;
+
 public abstract class Enemy extends Entity {
-    enum ENEMY_DIRECTION {
-        UP, DOWN, LEFT, RIGHT
+    public enum ENEMY_DIRECTION {
+        UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT
     }
 
     enum ENEMY_STATUS {
@@ -21,23 +23,26 @@ public abstract class Enemy extends Entity {
     public Enemy(double x, double y) {
         super(x, y, null);
     }
+
     public void move() {
-        double speed = 0.5 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
+        double speed = 0.4 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
+
         if (direction == ENEMY_DIRECTION.UP) y -= speed * speedLevel;
-        if (direction == ENEMY_DIRECTION.DOWN) y += speed * speedLevel;
-        if (direction == ENEMY_DIRECTION.LEFT) x -= speed * speedLevel;
-        if (direction == ENEMY_DIRECTION.RIGHT) x += speed * speedLevel;
-    }
-
-    @Override
-    public void update() {
-        animate++;
-        if (animate >= 60000) animate = 0;
-
-        if (status == ENEMY_STATUS.ACTIVE) {
-            move();
-        } else if (status == ENEMY_STATUS.KILLED) {
-            if (animate >= 120) delete();
+        else if (direction == ENEMY_DIRECTION.DOWN) y += speed * speedLevel;
+        else if (direction == ENEMY_DIRECTION.LEFT) x -= speed * speedLevel;
+        else if (direction == ENEMY_DIRECTION.RIGHT) x += speed * speedLevel;
+        else if (direction == ENEMY_DIRECTION.UP_LEFT) {
+            x -= speed * speedLevel;
+            y -= speed * speedLevel;
+        } else if (direction == ENEMY_DIRECTION.UP_RIGHT) {
+            x += speed * speedLevel;
+            y -= speed * speedLevel;
+        } else if (direction == ENEMY_DIRECTION.DOWN_LEFT) {
+            x -= speed * speedLevel;
+            y += speed * speedLevel;
+        } else if (direction == ENEMY_DIRECTION.DOWN_RIGHT) {
+            x += speed * speedLevel;
+            y += speed * speedLevel;
         }
     }
 
@@ -50,5 +55,17 @@ public abstract class Enemy extends Entity {
 
     public void delete() {
         status = ENEMY_STATUS.DELETED;
+    }
+
+    public ENEMY_DIRECTION calculateRandomDirection() {
+        int calc = (int) (Math.round(Math.random() * 1000)) % 8;
+        if (calc == 0) return UP;
+        else if (calc == 1) return ENEMY_DIRECTION.DOWN;
+        else if (calc == 2) return ENEMY_DIRECTION.LEFT;
+        else if (calc == 3) return ENEMY_DIRECTION.RIGHT;
+        else if (calc == 4) return ENEMY_DIRECTION.UP_LEFT;
+        else if (calc == 5) return ENEMY_DIRECTION.UP_RIGHT;
+        else if (calc == 6) return ENEMY_DIRECTION.DOWN_LEFT;
+        else return ENEMY_DIRECTION.DOWN_RIGHT;
     }
 }

@@ -55,4 +55,12 @@ public abstract class Entity {
             other.handleCollision(this);
         }
     }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }

@@ -36,8 +36,10 @@ public class Brick extends Entity {
 
     @Override
     public void handleCollision(Entity other) {
-        if (other instanceof Bomber) {
-            status = BRICK_STATUS.BROKEN;
+        if (status == BRICK_STATUS.ACTIVE) {
+            if (other instanceof Bomber) {
+                status = BRICK_STATUS.BROKEN;
+            }
         }
     }
 
