@@ -10,6 +10,11 @@ import uet.oop.bomberman.entities.enemy.Enemy;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.graphics.Sprite;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static uet.oop.bomberman.graphics.Sprite.bomb;
+
 public class Bomber extends Entity {
     enum BOMBER_STATUS {
         SPAWN, ACTIVE, KILLED, DEAD
@@ -23,6 +28,7 @@ public class Bomber extends Entity {
         private boolean check = false;
     }
 
+    private List<Bomb> bombList = new ArrayList<Bomb>();
     private BOMBER_STATUS status = BOMBER_STATUS.SPAWN;
     private Move move = new Move();
     private int lives = 3;
@@ -44,12 +50,17 @@ public class Bomber extends Entity {
             if (move.left) img = Sprite.movingSprite(Sprite.player_left_1, Sprite.blank, Sprite.player_left_2, Sprite.blank, animate, 20).getFxImage();
             if (move.right) img = Sprite.movingSprite(Sprite.player_right_1, Sprite.blank, Sprite.player_right_2, Sprite.blank, animate, 20).getFxImage();
             gc.drawImage(img, x, y);
+
+            for (Entity bomb : bombList) { bomb.render(gc);}
+
         } else if (status == BOMBER_STATUS.ACTIVE) {
             if (move.up) img = Sprite.movingSprite(Sprite.player_up, Sprite.player_up_1, Sprite.player_up_2, animate, 18).getFxImage();
             if (move.down) img = Sprite.movingSprite(Sprite.player_down, Sprite.player_down_1, Sprite.player_down_2, animate, 18).getFxImage();
             if (move.left) img = Sprite.movingSprite(Sprite.player_left, Sprite.player_left_1, Sprite.player_left_2, animate, 18).getFxImage();
             if (move.right) img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, animate, 18).getFxImage();
             gc.drawImage(img, x, y);
+
+            for (Entity bomb : bombList) { bomb.render(gc);}
         } else if (status == BOMBER_STATUS.KILLED) {
             img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, animate, 24).getFxImage();
             gc.drawImage(img, x, y);
@@ -68,19 +79,12 @@ public class Bomber extends Entity {
             if (move.down) y += speed * speedItemBuff;
             if (move.left) x -= speed * speedItemBuff;
             if (move.right) x += speed * speedItemBuff;
-            if (move.check) {
-                Bomb bomb = new Bomb(getXTile(), getYTile(), Sprite.bomb.getFxImage());
-                bomb.check = true;
-                BombermanGame.getBombLists().add(bomb);
-            }
+
+            for (Bomb b : bombList) b.update();
         } else if (status == BOMBER_STATUS.KILLED) {
             if (animate >= 24) respawn();
         }
-        if (move.check) {
-            Bomb bomb = new Bomb(getXTile(), getYTile(), Sprite.bomb.getFxImage());
-            bomb.check = true;
-            BombermanGame.getBombLists().add(bomb);
-        }
+
     }
 
     @Override
@@ -96,14 +100,14 @@ public class Bomber extends Entity {
             if (event.getCode() == KeyCode.S) move.down = true;
             if (event.getCode() == KeyCode.A) move.left = true;
             if (event.getCode() == KeyCode.D) move.right = true;
-            if (event.getCode() == KeyCode.SPACE) move.check = true;
+            if (event.getCode() == KeyCode.SPACE) addBomb();
         });
         scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyCode.W) move.up = false;
             if (event.getCode() == KeyCode.S) move.down = false;
             if (event.getCode() == KeyCode.A) move.left = false;
             if (event.getCode() == KeyCode.D) move.right = false;
-            if (event.getCode() == KeyCode.SPACE) move.check = false;
+            //if (event.getCode() == KeyCode.SPACE) move.check = false;
             if (event.getCode() == KeyCode.R) kill();
         });
     }
@@ -129,5 +133,9 @@ public class Bomber extends Entity {
     public void dead() {
         status = BOMBER_STATUS.DEAD;
         System.exit(0);
+    }
+
+    void addBomb() {
+        bombList.add(new Bomb(x / Sprite.SCALED_SIZE, y / Sprite.SCALED_SIZE, null));
     }
 }

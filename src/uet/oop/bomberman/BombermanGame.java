@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.entities.enemy.Balloom;
+import uet.oop.bomberman.entities.enemy.Doll;
 import uet.oop.bomberman.entities.enemy.Oneal;
 import uet.oop.bomberman.graphics.Sprite;
 
@@ -32,7 +33,7 @@ public class BombermanGame extends Application{
 
     private static List<Entity> killableEntities = new ArrayList<>();
     private static List<Entity> grasses = new ArrayList<>();
-    private static List<Entity> blockingEntities = new ArrayList<>(
+    private static List<Entity> blockingEntities = new ArrayList<>();
     private static List<Entity> bombLists = new ArrayList<>();
 
     private String level = "res/levels/Level1.txt";
@@ -106,13 +107,13 @@ public class BombermanGame extends Application{
                     blockingEntities.add(new Wall(j, i, Sprite.wall.getFxImage()));
                 } else if (line.charAt(j) == '*') {
                     grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
-                    blockingEntities.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    //blockingEntities.add(new Brick(j, i, Sprite.brick.getFxImage()));
                 } else if (line.charAt(j) == '1') {
                     grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
                     killableEntities.add(new Balloom(j, i));
                 } else if (line.charAt(j) == '2') {
                     grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
-                    killableEntities.add(new Oneal(j, i));
+                    //killableEntities.add(new Oneal(j, i));
                 } else {
                     grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
                 }
@@ -143,18 +144,6 @@ public class BombermanGame extends Application{
         grasses.forEach(g -> g.render(gc));
         blockingEntities.forEach(g -> g.render(gc));
         killableEntities.forEach(g -> g.render(gc));
-        for (Entity entity : bombLists) {
-            entities.add(entity);
-        }
-        bombLists.clear();
-    }
-
-    public static List<Entity> getStillObjects() {
-        return stillObjects;
-    }
-
-    public static List<Entity> getEntities() {
-        return entities;
     }
 
     public static List<Entity> getBombLists() {
