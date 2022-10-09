@@ -1,17 +1,19 @@
 package uet.oop.bomberman.entities.enemy;
 
-import uet.oop.bomberman.entities.Entity;
+import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.entities.*;
+import uet.oop.bomberman.entities.bomb.*;
 import uet.oop.bomberman.graphics.Sprite;
 
-import static uet.oop.bomberman.entities.enemy.Enemy.ENEMY_DIRECTION.LEFT;
-import static uet.oop.bomberman.entities.enemy.Enemy.ENEMY_DIRECTION.UP;
-
 public abstract class Enemy extends Entity {
+    protected static final int ANIMATE_TIME = 24;
+    protected static final int KILL_TIME = 120;
+
     public enum ENEMY_DIRECTION {
         UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT
     }
 
-    enum ENEMY_STATUS {
+    public enum ENEMY_STATUS {
         INACTIVE, ACTIVE, KILLED, DELETED
     }
 
@@ -19,9 +21,46 @@ public abstract class Enemy extends Entity {
     protected ENEMY_DIRECTION direction = ENEMY_DIRECTION.LEFT;
     protected double speedLevel = 1;
     protected int animate = 0;
+    protected int changeDirectionTimeMin = 120;
+    protected int changeDirectionTimeMax = 240;
+    private int changeDirectionTime = 0;
 
     public Enemy(double x, double y) {
         super(x, y, null);
+    }
+
+    @Override
+    public void update() {
+        animate++;
+
+        if (status == ENEMY_STATUS.ACTIVE) {
+            if (animate >= changeDirectionTime) {
+                direction = calculateDirection();
+                changeDirectionTime = changeDirectionTimeMin + (int) (Math.random() * 1000) % (changeDirectionTimeMax - changeDirectionTimeMin);
+            }
+            move();
+        } else if (status == ENEMY_STATUS.KILLED) {
+            if (animate >= KILL_TIME) delete();
+        }
+    }
+
+    @Override
+    public void handleCollision(Entity other) {
+        if (status == ENEMY_STATUS.ACTIVE) {
+            if (other instanceof Flame) {
+                if (((Flame) other).getStatus() == Flame.FLAME_STATUS.ACTIVE)
+                    kill();
+            }
+            if (other instanceof Bomb) {
+                if (((Bomb) other).getStatus() == Bomb.BOMB_STATUS.ACTIVE)
+                    direction = calculateRandomDirection();
+            }
+            if (other instanceof Wall) {
+                if (direction == ENEMY_DIRECTION.UP || direction == ENEMY_DIRECTION.DOWN
+                        || direction == ENEMY_DIRECTION.LEFT || direction == ENEMY_DIRECTION.RIGHT)
+                    direction = calculateRandomDirection();
+            }
+        }
     }
 
     public void move() {
@@ -49,17 +88,17 @@ public abstract class Enemy extends Entity {
     public void kill() {
         status = ENEMY_STATUS.KILLED;
         animate = 0;
-        width = 0;
-        height = 0;
     }
 
     public void delete() {
         status = ENEMY_STATUS.DELETED;
     }
 
+    public abstract ENEMY_DIRECTION calculateDirection();
+
     public ENEMY_DIRECTION calculateRandomDirection() {
         int calc = (int) (Math.round(Math.random() * 1000)) % 8;
-        if (calc == 0) return UP;
+        if (calc == 0) return ENEMY_DIRECTION.UP;
         else if (calc == 1) return ENEMY_DIRECTION.DOWN;
         else if (calc == 2) return ENEMY_DIRECTION.LEFT;
         else if (calc == 3) return ENEMY_DIRECTION.RIGHT;
@@ -67,5 +106,36 @@ public abstract class Enemy extends Entity {
         else if (calc == 5) return ENEMY_DIRECTION.UP_RIGHT;
         else if (calc == 6) return ENEMY_DIRECTION.DOWN_LEFT;
         else return ENEMY_DIRECTION.DOWN_RIGHT;
+    }
+
+    public ENEMY_DIRECTION calculateDirectionToBomber() {
+        double bomberX = BombermanGame.getBomber().getX();
+        double bomberY = BombermanGame.getBomber().getY();
+
+        if (x == bomberX) {
+            if (y < bomberY) return ENEMY_DIRECTION.DOWN;
+            else return ENEMY_DIRECTION.UP;
+        } else if (y == bomberY) {
+            if (x < bomberX) return ENEMY_DIRECTION.RIGHT;
+            else return ENEMY_DIRECTION.LEFT;
+        } else if (x > bomberX && y > bomberY) {
+            return ENEMY_DIRECTION.UP_LEFT;
+        } else if (x > bomberX) {
+            return ENEMY_DIRECTION.DOWN_LEFT;
+        } else if (y > bomberY) {
+            return ENEMY_DIRECTION.UP_RIGHT;
+        } else {
+            return ENEMY_DIRECTION.DOWN_RIGHT;
+        }
+    }
+
+    public double calcBomberDistance() {
+        double bomberX = BombermanGame.getBomber().getX();
+        double bomberY = BombermanGame.getBomber().getY();
+        return Math.sqrt(Math.pow(x - bomberX, 2) + Math.pow(y - bomberY, 2));
+    }
+
+    public ENEMY_STATUS getStatus() {
+        return status;
     }
 }
