@@ -1,11 +1,15 @@
-package uet.oop.bomberman.entities;
+package uet.oop.bomberman.entities.map;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import uet.oop.bomberman.entities.Entity;
+import uet.oop.bomberman.entities.bomb.Flame;
 import uet.oop.bomberman.graphics.Sprite;
 
-public class Brick extends Entity {
-    enum BRICK_STATUS {
+public class Brick extends MapEntity {
+    private final int BROKEN_ANIMATE_TIME = 15;
+
+    public enum BRICK_STATUS {
         ACTIVE, BROKEN, DELETED
     }
 
@@ -21,7 +25,7 @@ public class Brick extends Entity {
         if (status == BRICK_STATUS.ACTIVE) {
             gc.drawImage(img, x, y);
         } else if (status == BRICK_STATUS.BROKEN) {
-            img = Sprite.movingSprite(Sprite.brick_exploded, Sprite.brick_exploded1, Sprite.brick_exploded2, animate, 18).getFxImage();
+            img = Sprite.movingSprite(Sprite.brick_exploded, Sprite.brick_exploded1, Sprite.brick_exploded2, animate, BROKEN_ANIMATE_TIME).getFxImage();
             gc.drawImage(img, x, y);
         }
     }
@@ -30,23 +34,27 @@ public class Brick extends Entity {
     public void update() {
         if (status == BRICK_STATUS.BROKEN) {
             animate++;
-            if (animate >= 18) delete();
+            if (animate >= BROKEN_ANIMATE_TIME) delete();
         }
     }
 
     @Override
     public void handleCollision(Entity other) {
         if (status == BRICK_STATUS.ACTIVE) {
-            if (other instanceof Bomber) {
-                status = BRICK_STATUS.BROKEN;
+            if (other instanceof Flame) {
+                Flame fl = (Flame) other;
+                if (fl.getStatus() == Flame.FLAME_STATUS.ACTIVE)
+                    status = BRICK_STATUS.BROKEN;
             }
         }
     }
 
     public void delete() {
         status = BRICK_STATUS.DELETED;
-        width = 0;
-        height = 0;
         img = null;
+    }
+
+    public BRICK_STATUS getStatus() {
+        return status;
     }
 }

@@ -3,10 +3,11 @@ package uet.oop.bomberman.entities.enemy;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.entities.bomb.*;
+import uet.oop.bomberman.entities.map.Wall;
 import uet.oop.bomberman.graphics.Sprite;
 
 public abstract class Enemy extends Entity {
-    protected static final int ANIMATE_TIME = 24;
+    protected static final int ANIMATE_TIME = 32;
     protected static final int KILL_TIME = 120;
 
     public enum ENEMY_DIRECTION {

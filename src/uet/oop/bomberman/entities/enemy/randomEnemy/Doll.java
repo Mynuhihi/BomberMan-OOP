@@ -1,7 +1,7 @@
 package uet.oop.bomberman.entities.enemy.randomEnemy;
 
 import javafx.scene.canvas.GraphicsContext;
-import uet.oop.bomberman.entities.Brick;
+import uet.oop.bomberman.entities.map.Brick;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.enemy.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
