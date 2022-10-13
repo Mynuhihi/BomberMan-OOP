@@ -8,11 +8,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import uet.oop.bomberman.entities.*;
-import uet.oop.bomberman.entities.enemy.Balloom;
-import uet.oop.bomberman.entities.enemy.Doll;
-import uet.oop.bomberman.entities.enemy.Oneal;
+import uet.oop.bomberman.entities.bomb.*;
+import uet.oop.bomberman.entities.enemy.*;
+import uet.oop.bomberman.entities.enemy.chaseEnemy.*;
+import uet.oop.bomberman.entities.enemy.randomEnemy.*;
+import uet.oop.bomberman.entities.map.*;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.io.FileInputStream;
@@ -25,16 +28,15 @@ public class BombermanGame extends Application{
     //kich thuoc stage
     public static final int WIDTH = 31;
     public static final int HEIGHT = 13;
-    public static final double STAGE_WIDTH = 16 * Sprite.SCALED_SIZE;
+    public static final double STAGE_WIDTH = 32 * Sprite.SCALED_SIZE;
     public static final double STAGE_HEIGHT = 13 * Sprite.SCALED_SIZE + 47;
 
     private GraphicsContext gc;
     private Canvas canvas;
 
-    private static List<Entity> killableEntities = new ArrayList<>();
-    private static List<Entity> grasses = new ArrayList<>();
-    private static List<Entity> blockingEntities = new ArrayList<>();
-    private static List<Entity> bombLists = new ArrayList<>();
+    private static Bomber bomber;
+    private static List<Enemy> enemy = new ArrayList<>();
+    private static Map mapEntities = new Map(); // cai grass de lam background
 
     private String level = "res/levels/Level1.txt";
 
@@ -74,16 +76,13 @@ public class BombermanGame extends Application{
         };
         timer.start();
 
-        //Bomber
-        Bomber bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage());
-        killableEntities.add(bomberman);
-        bomberman.addControl(scene);
-
         try {
             createMap(level);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        bomber.addControl(scene);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -104,18 +103,23 @@ public class BombermanGame extends Application{
             line = scanner.nextLine();
             for (int j = 0; j < col; j++) {
                 if (line.charAt(j) == '#') {
-                    blockingEntities.add(new Wall(j, i, Sprite.wall.getFxImage()));
+                    mapEntities.add(new Wall(j, i, Sprite.wall.getFxImage()));
                 } else if (line.charAt(j) == '*') {
-                    grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
-                    //blockingEntities.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    mapEntities.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                } else if (line.charAt(j) == 'p') {
+                    bomber = new Bomber(j, i, Sprite.player_right.getFxImage());
                 } else if (line.charAt(j) == '1') {
-                    grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
-                    killableEntities.add(new Balloom(j, i));
+                    enemy.add(new Balloom(j, i));
                 } else if (line.charAt(j) == '2') {
-                    grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
-                    //killableEntities.add(new Oneal(j, i));
-                } else {
-                    grasses.add(new Grass(j, i, Sprite.grass.getFxImage()));
+                    enemy.add(new Oneal(j, i));
+                } else if (line.charAt(j) == '3') {
+                    enemy.add(new Doll(j, i));
+                } else if (line.charAt(j) == '4') {
+                    enemy.add(new Minvo(j, i));
+                } else if (line.charAt(j) == '5') {
+                    enemy.add(new Kondoria(j, i));
+                } else if (line.charAt(j) == '6') {
+                    enemy.add(new Ovape(j, i));
                 }
             }
         }
@@ -124,34 +128,59 @@ public class BombermanGame extends Application{
     }
 
     public void checkAllCollisions() {
-        Bomber bomber = (Bomber) killableEntities.get(0);
-        for (Entity entity : blockingEntities) {
-            for (Entity mob : killableEntities) {
-                entity.checkCollision(mob, true);
-                bomber.checkCollision(mob, false);
+        // Kiem tra va cham all enemy voi all brick/wall, bomber, all bomb (enemy khong di qua bomb duoc)
+        for (Entity e : enemy) {
+            for (Entity map : mapEntities.getMap()) {
+                map.checkCollision(e, !(e instanceof BrickPass && map instanceof Brick));
             }
+            for (Bomb bomb : bomber.getBombList()) {
+                bomb.checkCollision(e, true);
+            }
+            bomber.checkCollision(e, false);
+        }
+        // Kiem tra va cham all brick/wall voi bomber
+        for (Entity entity : mapEntities.getMap()) {
+            entity.checkCollision(bomber, true);
+        }
+        // Kiem tra va cham all flame voi all enemy, all brick/wall, all bomb, bomber
+        for (Flame fl : bomber.getFlameList()) {
+            for (Entity e : mapEntities.getMap()) {
+                e.checkCollision(fl, false);
+            }
+            for (Entity e : enemy) {
+                fl.checkCollision(e, false);
+            }
+            for (Bomb b : bomber.getBombList()) {
+                fl.checkCollision(b, false);
+            }
+            bomber.checkCollision(fl, false);
         }
     }
 
     public void update() {
-        blockingEntities.forEach(Entity::update);
-        killableEntities.forEach(Entity::update);
+//        mapEntities.forEach(Entity::update);
+        mapEntities.update();
+        enemy.forEach(Entity::update);
+        bomber.update();
     }
 
     public void render() {
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        // Set background cho graphicsContext
+        gc.setFill(Color.rgb(80, 160, 0));
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        grasses.forEach(g -> g.render(gc));
-        blockingEntities.forEach(g -> g.render(gc));
-        killableEntities.forEach(g -> g.render(gc));
-    }
-
-    public static List<Entity> getBombLists() {
-        return bombLists;
+        // Ve cac entity
+//        mapEntities.forEach(g -> g.render(gc));
+        mapEntities.render(gc);
+        bomber.render(gc);
+        enemy.forEach(g -> g.render(gc));
     }
 
     public static Entity getBomber() {
-        return killableEntities.get(0);
+        return bomber;
     }
 
+    public static Map getMap() {
+        return mapEntities;
+    }
 }
