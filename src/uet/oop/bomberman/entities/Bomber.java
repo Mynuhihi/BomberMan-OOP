@@ -31,8 +31,8 @@ public class Bomber extends Entity {
     private Move move = new Move();
     private int lives = 3;
     private double speedItemBuff = 1;
-    private int bombLength = 1;
-    private int maxBomb = 1;
+    private int bombLength = 2;
+    private int maxBomb = 2;
     private int animate = 0;
 
     public Bomber(double x, double y, Image img) {
@@ -85,7 +85,7 @@ public class Bomber extends Entity {
         bombList.update();
 
         if (status == BOMBER_STATUS.SPAWN) {
-            if (animate >= 90) status = BOMBER_STATUS.ACTIVE;
+            if (animate >= 60) status = BOMBER_STATUS.ACTIVE;
         }
         if (status == BOMBER_STATUS.ACTIVE || status == BOMBER_STATUS.SPAWN) {
             double speed = 0.8 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
@@ -151,8 +151,8 @@ public class Bomber extends Entity {
 //        x = Sprite.SCALED_SIZE * randomX;
 //        y = Sprite.SCALED_SIZE * randomY;
 
-        x = Sprite.SCALED_SIZE;
-        y = Sprite.SCALED_SIZE;
+//        x = Sprite.SCALED_SIZE;
+//        y = Sprite.SCALED_SIZE;
 
         lives--;
 //        if (lives == 0) dead();

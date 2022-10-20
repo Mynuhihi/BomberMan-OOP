@@ -12,6 +12,7 @@ public class Kondoria extends ChaseEnemy implements BrickPass {
         chasingDistance = 0;
         changeDirectionTimeMin = 0;
         changeDirectionTimeMax = 90;
+        score = 1000;
     }
 
     @Override
