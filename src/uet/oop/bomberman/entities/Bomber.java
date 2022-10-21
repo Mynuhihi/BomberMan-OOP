@@ -29,10 +29,10 @@ public class Bomber extends Entity {
     private BOMBER_STATUS status = BOMBER_STATUS.SPAWN;
     private BombList bombList = new BombList();
     private Move move = new Move();
-    private int lives = 3;
+    private int lives = 2;
     private double speedItemBuff = 1;
-    private int bombLength = 2;
-    private int maxBomb = 2;
+    private int bombLength = 1;
+    private int maxBomb = 1;
     private int animate = 0;
 
     public Bomber(double x, double y, Image img) {
@@ -151,11 +151,11 @@ public class Bomber extends Entity {
 //        x = Sprite.SCALED_SIZE * randomX;
 //        y = Sprite.SCALED_SIZE * randomY;
 
-//        x = Sprite.SCALED_SIZE;
-//        y = Sprite.SCALED_SIZE;
+        x = Sprite.SCALED_SIZE;
+        y = Sprite.SCALED_SIZE;
 
         lives--;
-//        if (lives == 0) dead();
+        if (lives < 0) dead();
     }
 
     /**
@@ -163,8 +163,6 @@ public class Bomber extends Entity {
      */
     public void dead() {
         status = BOMBER_STATUS.DEAD;
-        //TODO
-        System.exit(0);
     }
 
     /**
@@ -185,5 +183,13 @@ public class Bomber extends Entity {
 
     public List<Flame> getFlameList() {
         return bombList.getFlameList();
+    }
+
+    public BOMBER_STATUS getStatus() {
+        return status;
+    }
+
+    public int getLives() {
+        return lives;
     }
 }

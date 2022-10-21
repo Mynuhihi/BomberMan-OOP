@@ -18,7 +18,7 @@ public class MenuScene extends Scenes {
         START, CONTINUE
     }
 
-    private MENU_BUTTON currentButton = MENU_BUTTON.START;
+    private MENU_BUTTON currentButton = MENU_BUTTON.CONTINUE;
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
@@ -30,7 +30,8 @@ public class MenuScene extends Scenes {
         root.getChildren().add(canvas);
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) BombermanGame.setScene(new LevelScene(new Group(), 1));
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE)
+                BombermanGame.setScene(new LevelScene(new Group(), 1));
             if (event.getCode() == KeyCode.D || event.getCode() == KeyCode.A) nextButton();
         });
     }
@@ -53,7 +54,7 @@ public class MenuScene extends Scenes {
         Scenes.renderText(canvas,">", xButton, y, scale, Color.WHITE, Color.GRAY);
 
         Scenes.renderText(canvas,"START\tCONTINUE", 72, y, scale, Color.WHITE, Color.GRAY);
-        Scenes.renderText(canvas,"TOP\t0", 72, y + 16, scale, Color.WHITE, Color.GRAY);
+        Scenes.renderText(canvas,"TOP\t" + BombermanGame.HIGH_SCORE, 72, y + 16, scale, Color.WHITE, Color.GRAY);
         Scenes.renderTextXCenter(canvas,"TM AND © 1987 HUDSON SOFT", y + 32, scale, Color.WHITE, Color.GRAY);
         Scenes.renderTextXCenter(canvas,"LICENSED BY", y + 48, scale, Color.WHITE, Color.GRAY);
         Scenes.renderTextXCenter(canvas,"NINTENDO OF AMERICA INC.", y + 64, scale, Color.WHITE, Color.GRAY);

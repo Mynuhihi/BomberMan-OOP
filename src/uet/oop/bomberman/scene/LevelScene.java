@@ -9,13 +9,15 @@ import uet.oop.bomberman.BombermanGame;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LevelScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
     private int level;
-    private int count = 0;
+    private Timer timer = new Timer();
 
     public LevelScene(Group root, int level) {
         super(root);
@@ -24,12 +26,19 @@ public class LevelScene extends Scenes {
         canvas = new Canvas(256 * scale, 240 * scale);
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                BombermanGame.setScene(new GameScene(new Group()));
+            }
+        }, 3000);
     }
 
     @Override
     public void show() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setFill(Color.rgb(0, 0, 0));
+        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         Scenes.renderTextYCenter(canvas, String.format("STAGE %2d", level), 80, scale, Color.WHITE, Color.GRAY);
@@ -38,11 +47,6 @@ public class LevelScene extends Scenes {
             gc.setFont(Font.loadFont(new FileInputStream("res/font/Kongtext.ttf"), 8 * scale));
         } catch (FileNotFoundException e) {
             System.exit(1);
-        }
-
-        count++;
-        if (count == 180) {
-            BombermanGame.setScene(new GameScene(new Group()));
         }
     }
 }
