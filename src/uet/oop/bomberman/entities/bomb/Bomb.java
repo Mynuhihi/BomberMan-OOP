@@ -11,6 +11,9 @@ import java.util.List;
 public class Bomb extends Entity {
     public static final int ANIMATE_TIME = 48;
 
+    public Bomb(double v, double v1, Object o) {
+    }
+
     public enum BOMB_STATUS {
         ACTIVE, EXPLORED, DELETED
     }

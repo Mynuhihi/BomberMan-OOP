@@ -17,6 +17,8 @@ import uet.oop.bomberman.entities.enemy.randomEnemy.*;
 import uet.oop.bomberman.entities.map.*;
 import uet.oop.bomberman.entities.map.Map;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.items.BombItem;
+import uet.oop.bomberman.items.Item;
 import uet.oop.bomberman.sounds.Sound;
 
 import java.io.*;
@@ -33,6 +35,7 @@ public class GameScene extends Scenes {
 
     private static Bomber bomber;
     private static List<Enemy> enemyList = new ArrayList<>();
+    private static List<Item> itemList = new ArrayList<>();
     private static Map map = new Map();
 
     private Timer timer = new Timer();
@@ -112,6 +115,9 @@ public class GameScene extends Scenes {
                     enemyList.add(new Kondoria(j, i));
                 } else if (line.charAt(j) == '6') {
                     enemyList.add(new Ovape(j, i));
+                } else if (line.charAt(j) == 'b') {
+                    map.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    itemList.add(new BombItem(j, i, Sprite.powerup_bombs.getFxImage()));
                 }
             }
         }
@@ -165,7 +171,9 @@ public class GameScene extends Scenes {
             e.update();
         }
         if (enemyList.size() == 0) nextLevel();
-
+        for (Item item: itemList) {
+            item.update();
+        }
         updateCamera();
         updateScoreboard();
     }
@@ -194,7 +202,7 @@ public class GameScene extends Scenes {
         map.render(gc);
         bomber.render(gc);
         enemyList.forEach(g -> g.render(gc));
-
+        itemList.forEach(g -> g.render(gc));
         renderScoreboard();
     }
 

@@ -11,6 +11,10 @@ public abstract class Entity {
     protected double y;
     protected double width;
     protected double height;
+/*    protected boolean remove = false;
+    public boolean isRemove() {
+        return remove;
+    }*/
 
     protected Image img;
 
