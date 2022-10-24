@@ -3,9 +3,11 @@ package uet.oop.bomberman.scene;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +19,7 @@ public class GameOverScene extends Scenes {
     private GraphicsContext gc;
     private Canvas canvas;
     private Timer timer = new Timer();
+    private MediaPlayer mediaPlayer = Sound.gameOverSound.getMediaPlayer();
 
     public GameOverScene(Group root) {
         super(root);
@@ -25,9 +28,12 @@ public class GameOverScene extends Scenes {
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        mediaPlayer.play();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                mediaPlayer.stop();
                 BombermanGame.setScene(new MenuScene(new Group()));
             }
         }, 8000);
@@ -40,7 +46,7 @@ public class GameOverScene extends Scenes {
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         Scenes.renderTextCenter(canvas, "GAME OVER", scale, Color.WHITE, Color.GRAY);
-        Scenes.renderTextXCenter(canvas, "YOUR SCORE " + GameScene.getScore(), 200, scale, Color.WHITE, Color.GRAY);
+        Scenes.renderTextXCenter(canvas, "SCORE " + GameScene.getScore(), 200, scale, Color.WHITE, Color.GRAY);
 
         try {
             gc.setFont(Font.loadFont(new FileInputStream("res/font/Kongtext.ttf"), 8 * scale));

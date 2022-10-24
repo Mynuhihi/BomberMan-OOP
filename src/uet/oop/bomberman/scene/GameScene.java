@@ -4,9 +4,11 @@ import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.IO;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.entities.bomb.*;
 import uet.oop.bomberman.entities.enemy.*;
@@ -15,11 +17,10 @@ import uet.oop.bomberman.entities.enemy.randomEnemy.*;
 import uet.oop.bomberman.entities.map.*;
 import uet.oop.bomberman.entities.map.Map;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.io.*;
 import java.util.*;
-
-import static uet.oop.bomberman.BombermanGame.HIGH_SCORE;
 
 public class GameScene extends Scenes {
     private double CANVAS_WIDTH;
@@ -34,24 +35,24 @@ public class GameScene extends Scenes {
     private static List<Enemy> enemyList = new ArrayList<>();
     private static Map map = new Map();
 
-    private boolean pause = false;
-    private static int score = 0;
     private Timer timer = new Timer();
     private int time = 200;
 
-    private String level = "res/levels/Level1.txt";
+    private MediaPlayer soundtrack = Sound.gameSound.getMediaPlayer();
 
     public GameScene(Group root) {
         super(root);
         enemyList = new ArrayList<>();
         map = new Map();
-        score = 0;
 
         try {
+            String level = getLevelPath();
             createMap(level);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        IO.readBomberData(bomber);
 
         canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         gc = canvas.getGraphicsContext2D();
@@ -60,8 +61,11 @@ public class GameScene extends Scenes {
 
         bomber.addControl(this);
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ESCAPE) BombermanGame.setScene(new MenuScene(new Group()));
-            if (event.getCode() == KeyCode.ENTER) pause = !pause;
+            if (event.getCode() == KeyCode.ESCAPE) {
+                soundtrack.stop();
+                bomber.stopSound();
+                BombermanGame.setScene(new MenuScene(new Group()));
+            }
         });
 
         this.setCamera(camera);
@@ -72,6 +76,8 @@ public class GameScene extends Scenes {
                 time--;
             }
         }, 1000, 1000);
+
+        soundtrack.play();
     }
 
     public void createMap(String path) throws FileNotFoundException {
@@ -114,21 +120,23 @@ public class GameScene extends Scenes {
     }
 
     public void checkAllCollisions() {
-        // Kiem tra va cham all enemy voi all brick/wall, bomber, all bomb (enemy khong di qua bomb duoc)
-        for (Entity e : enemyList) {
+        // Kiem tra va cham all enemy voi all brick/wall, bomber.txt, all bomb (enemy khong di qua bomb duoc)
+        for (Enemy e : enemyList) {
             for (Entity map : map.getMap()) {
                 map.checkCollision(e, !(e instanceof BrickPass && map instanceof Brick));
             }
-            for (Bomb bomb : bomber.getBombList()) {
-                bomb.checkCollision(e, true);
+            if (e.getStatus() == Enemy.ENEMY_STATUS.ACTIVE) {
+                for (Bomb bomb : bomber.getBombList()) {
+                    bomb.checkCollision(e, true);
+                }
             }
             bomber.checkCollision(e, false);
         }
-        // Kiem tra va cham all brick/wall voi bomber
+        // Kiem tra va cham all brick/wall voi bomber.txt
         for (Entity entity : map.getMap()) {
             entity.checkCollision(bomber, true);
         }
-        // Kiem tra va cham all flame voi all enemy, all brick/wall, all bomb, bomber
+        // Kiem tra va cham all flame voi all enemy, all brick/wall, all bomb, bomber.txt
         for (Flame fl : bomber.getFlameList()) {
             for (Entity e : map.getMap()) {
                 e.checkCollision(fl, false);
@@ -148,10 +156,7 @@ public class GameScene extends Scenes {
 
         map.update();
         bomber.update();
-        if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) {
-            updateHighScore();
-            BombermanGame.setScene(new GameOverScene(new Group()));
-        }
+        if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) gameOver();
 
         Iterator<Enemy> it = enemyList.iterator();
         while (it.hasNext()) {
@@ -159,10 +164,7 @@ public class GameScene extends Scenes {
             if (e.getStatus() == Enemy.ENEMY_STATUS.DELETED) it.remove();
             e.update();
         }
-        if (enemyList.size() == 0) {
-            updateHighScore();
-            BombermanGame.setScene(new WinScene(new Group()));
-        }
+        if (enemyList.size() == 0) nextLevel();
 
         updateCamera();
         updateScoreboard();
@@ -200,7 +202,7 @@ public class GameScene extends Scenes {
         scoreboard.getGraphicsContext2D().setFill(Color.rgb(180, 180, 180));
         scoreboard.getGraphicsContext2D().fillRect(0, 0, scoreboard.getWidth(), scoreboard.getHeight());
 
-        Scenes.renderTextCenter(scoreboard, String.format("TIME %3d   SCORE %7d   LEFT %2d", time, score, bomber.getLives()), 3, Color.WHITE, Color.BLACK);
+        Scenes.renderTextCenter(scoreboard, String.format("TIME %3d   SCORE %7d   LEFT %2d", time, bomber.getScore(), bomber.getLife()), 3, Color.WHITE, Color.BLACK);
 
         try {
             scoreboard.getGraphicsContext2D().setFont(Font.loadFont(new FileInputStream("res/font/Kongtext.ttf"), 20));
@@ -218,33 +220,60 @@ public class GameScene extends Scenes {
     }
 
     public static int getScore() {
-        return score;
+        return bomber.getScore();
     }
 
     public static void addScore(int score) {
-        GameScene.score += score;
+        bomber.setScore(bomber.getScore() + score);
     }
 
     @Override
     public void show() {
-        if (!pause) {
-            render();
-            update();
-            checkAllCollisions();
+        render();
+        update();
+        checkAllCollisions();
+    }
+
+    public void nextLevel() {
+        try {
+            bomber.stopSound();
+            soundtrack.stop();
+            if (bomber.getScore() > BombermanGame.HIGH_SCORE) {
+                BombermanGame.HIGH_SCORE = bomber.getScore();
+                IO.writeToFile(bomber.getScore(), "res/data/highscore.txt");
+            }
+            if (BombermanGame.CURRENT_LEVEL == BombermanGame.MAX_LEVEL) {
+                IO.writeBomberData(bomber);
+                BombermanGame.setScene(new WinScene(new Group()));
+            } else {
+                BombermanGame.CURRENT_LEVEL++;
+                IO.writeToFile(BombermanGame.CURRENT_LEVEL, "res/data/curlevel.txt");
+                IO.writeBomberData(bomber);
+                BombermanGame.setScene(new LevelScene(new Group()));
+            }
+        } catch (IOException e) {
+            System.exit(1);
         }
     }
 
-    public void updateHighScore() {
-        if (score <= HIGH_SCORE) return;
-        else {
-            HIGH_SCORE = score;
-            try {
-                FileWriter out = new FileWriter("res/data/highscore.txt");
-                out.write(Integer.toString(score));
-                out.close();
-            } catch (IOException e) {
-                System.exit(1);
+    public void gameOver() {
+        try {
+            bomber.stopSound();
+            soundtrack.stop();
+            if (bomber.getScore() > BombermanGame.HIGH_SCORE) {
+                BombermanGame.HIGH_SCORE = bomber.getScore();
+                IO.writeToFile(bomber.getScore(), "res/data/highscore.txt");
             }
+            IO.newGame();
+            BombermanGame.setScene(new GameOverScene(new Group()));
+        } catch (IOException e) {
+            System.exit(1);
         }
+    }
+
+    public String getLevelPath() {
+        if (1 <= BombermanGame.CURRENT_LEVEL && BombermanGame.CURRENT_LEVEL <= BombermanGame.MAX_LEVEL) {
+            return "res/levels/Level" + BombermanGame.CURRENT_LEVEL + ".txt";
+        } else return null;
     }
 }

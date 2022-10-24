@@ -3,9 +3,12 @@ package uet.oop.bomberman.scene;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,20 +19,22 @@ public class LevelScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
-    private int level;
     private Timer timer = new Timer();
+    private MediaPlayer mediaPlayer = Sound.levelSound.getMediaPlayer();;
 
-    public LevelScene(Group root, int level) {
+    public LevelScene(Group root) {
         super(root);
-        this.level = level;
 
         canvas = new Canvas(256 * scale, 240 * scale);
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        mediaPlayer.play();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                mediaPlayer.stop();
                 BombermanGame.setScene(new GameScene(new Group()));
             }
         }, 3000);
@@ -41,7 +46,7 @@ public class LevelScene extends Scenes {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        Scenes.renderTextYCenter(canvas, String.format("STAGE %2d", level), 80, scale, Color.WHITE, Color.GRAY);
+        Scenes.renderTextYCenter(canvas, String.format("STAGE %2d", BombermanGame.CURRENT_LEVEL), 80, scale, Color.WHITE, Color.GRAY);
 
         try {
             gc.setFont(Font.loadFont(new FileInputStream("res/font/Kongtext.ttf"), 8 * scale));

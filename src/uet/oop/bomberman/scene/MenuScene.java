@@ -6,9 +6,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.IO;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,17 +25,21 @@ public class MenuScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
+    private MediaPlayer mediaPlayer = Sound.menuSound.getMediaPlayer();
 
     public MenuScene(Group root) {
         super(root);
+
         canvas = new Canvas(256 * scale, 240 * scale);
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        mediaPlayer.play();
+
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE)
-                BombermanGame.setScene(new LevelScene(new Group(), 1));
-            if (event.getCode() == KeyCode.D || event.getCode() == KeyCode.A) nextButton();
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE) buttonPress();
+            if (event.getCode() == KeyCode.A) currentButton = MENU_BUTTON.START;
+            if (event.getCode() == KeyCode.D) currentButton = MENU_BUTTON.CONTINUE;
         });
     }
 
@@ -66,8 +73,11 @@ public class MenuScene extends Scenes {
         }
     }
 
-    public void nextButton() {
-        if (currentButton == MENU_BUTTON.START) currentButton = MENU_BUTTON.CONTINUE;
-        else if (currentButton == MENU_BUTTON.CONTINUE) currentButton = MENU_BUTTON.START;
+    public void buttonPress() {
+        if (currentButton == MENU_BUTTON.START) {
+            IO.newGame();
+        }
+        mediaPlayer.stop();
+        BombermanGame.setScene(new LevelScene(new Group()));
     }
 }

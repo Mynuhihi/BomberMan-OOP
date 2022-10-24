@@ -8,15 +8,15 @@ import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.scene.MenuScene;
 import uet.oop.bomberman.scene.Scenes;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class BombermanGame extends Application {
     public static final double STAGE_WIDTH = 720;
     public static final double STAGE_HEIGHT = 675;
     public static int HIGH_SCORE = 0;
+    public static int CURRENT_LEVEL = 1;
+    public static int MAX_LEVEL = 4;
+
     private static Scenes currentScene = new MenuScene(new Group());
 
     public static void main(String[] args) {
@@ -25,7 +25,13 @@ public class BombermanGame extends Application {
 
     @Override
     public void start(Stage stage) {
-        readHighScore();
+        try {
+            HIGH_SCORE = Integer.parseInt(IO.readFromFile("res/data/highscore.txt"));
+            CURRENT_LEVEL = Integer.parseInt(IO.readFromFile("res/data/curlevel.txt"));
+            MAX_LEVEL = Integer.parseInt(IO.readFromFile("res/data/maxlevel.txt"));
+        } catch (IOException e) {
+            System.exit(1);
+        }
 
         stage.setTitle("Bomberman");
         stage.sizeToScene();
@@ -46,16 +52,5 @@ public class BombermanGame extends Application {
 
     public static void setScene(Scenes scene) {
         BombermanGame.currentScene = scene;
-    }
-
-    public static void readHighScore() {
-        try {
-            FileReader reader = new FileReader("res/data/highscore.txt");
-            Scanner scanner = new Scanner(reader);
-            HIGH_SCORE = scanner.nextInt();
-            reader.close();
-        } catch (IOException e) {
-            System.exit(1);
-        }
     }
 }
