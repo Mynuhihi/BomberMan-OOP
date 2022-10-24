@@ -11,6 +11,7 @@ public class Minvo extends ChaseEnemy {
         chasingDistance = 8;
         changeDirectionTimeMin = 60;
         changeDirectionTimeMax = 120;
+        score = 800;
     }
 
     @Override

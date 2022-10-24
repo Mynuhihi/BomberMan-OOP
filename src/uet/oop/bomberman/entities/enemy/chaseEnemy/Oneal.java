@@ -8,6 +8,7 @@ public class Oneal extends ChaseEnemy {
         super(x, y);
         changeDirectionTimeMin = 90;
         changeDirectionTimeMax = 210;
+        score = 200;
     }
 
     @Override

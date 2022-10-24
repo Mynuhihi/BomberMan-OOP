@@ -11,6 +11,7 @@ public class Ovape extends RandomEnemy implements BrickPass {
         speedLevel = 1.5;
         changeDirectionTimeMin = 60;
         changeDirectionTimeMax = 180;
+        score = 2000;
     }
 
     @Override

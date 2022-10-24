@@ -1,8 +1,10 @@
 package uet.oop.bomberman.entities.bomb;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.MediaPlayer;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.util.List;
 
@@ -82,6 +84,9 @@ public class Bomb extends Entity {
         status = BOMB_STATUS.EXPLORED;
         animate = 0;
         flames.active();
+
+        MediaPlayer explore = Sound.exploreSound.getMediaPlayer();
+        Sound.playSound(explore, 1200);
     }
 
     public void delete() {

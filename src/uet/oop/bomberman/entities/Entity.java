@@ -61,12 +61,4 @@ public abstract class Entity {
     public double getY() {
         return y;
     }
-
-    public double getXUnit() {
-        return x / Sprite.SCALED_SIZE;
-    }
-
-    public double getYUnit() {
-        return y / Sprite.SCALED_SIZE;
-    }
 }

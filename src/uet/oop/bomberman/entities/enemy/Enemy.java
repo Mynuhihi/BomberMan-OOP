@@ -1,6 +1,6 @@
 package uet.oop.bomberman.entities.enemy;
 
-import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.scene.GameScene;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.entities.bomb.*;
 import uet.oop.bomberman.entities.map.Wall;
@@ -20,6 +20,7 @@ public abstract class Enemy extends Entity {
 
     protected ENEMY_STATUS status = ENEMY_STATUS.ACTIVE;
     protected ENEMY_DIRECTION direction = ENEMY_DIRECTION.LEFT;
+    protected int score = 0;
     protected double speedLevel = 1;
     protected int animate = 0;
     protected int changeDirectionTimeMin = 120;
@@ -93,6 +94,7 @@ public abstract class Enemy extends Entity {
 
     public void delete() {
         status = ENEMY_STATUS.DELETED;
+        GameScene.addScore(score);
     }
 
     public abstract ENEMY_DIRECTION calculateDirection();
@@ -110,8 +112,8 @@ public abstract class Enemy extends Entity {
     }
 
     public ENEMY_DIRECTION calculateDirectionToBomber() {
-        double bomberX = BombermanGame.getBomber().getX();
-        double bomberY = BombermanGame.getBomber().getY();
+        double bomberX = GameScene.getBomber().getX();
+        double bomberY = GameScene.getBomber().getY();
 
         if (x == bomberX) {
             if (y < bomberY) return ENEMY_DIRECTION.DOWN;
@@ -131,8 +133,8 @@ public abstract class Enemy extends Entity {
     }
 
     public double calcBomberDistance() {
-        double bomberX = BombermanGame.getBomber().getX();
-        double bomberY = BombermanGame.getBomber().getY();
+        double bomberX = GameScene.getBomber().getX();
+        double bomberY = GameScene.getBomber().getY();
         return Math.sqrt(Math.pow(x - bomberX, 2) + Math.pow(y - bomberY, 2));
     }
 

@@ -12,6 +12,7 @@ public class Doll extends RandomEnemy {
         speedLevel = 1.75;
         changeDirectionTimeMin = 60;
         changeDirectionTimeMax = 180;
+        score = 400;
     }
 
     @Override

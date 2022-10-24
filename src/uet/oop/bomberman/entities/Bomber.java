@@ -6,11 +6,14 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import uet.oop.bomberman.entities.bomb.Bomb;
 import uet.oop.bomberman.entities.bomb.BombList;
 import uet.oop.bomberman.entities.bomb.Flame;
 import uet.oop.bomberman.entities.enemy.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.sounds.Sound;
 
 import java.util.List;
 
@@ -29,11 +32,20 @@ public class Bomber extends Entity {
     private BOMBER_STATUS status = BOMBER_STATUS.SPAWN;
     private BombList bombList = new BombList();
     private Move move = new Move();
-    private int lives = 3;
-    private double speedItemBuff = 1;
+    private int animate = 0;
+
+    private int score = 0;
+    private int life = 2;
+    private int speedLevel = 0;
     private int bombLength = 1;
     private int maxBomb = 1;
-    private int animate = 0;
+
+    private final MediaPlayer bomberVerticalMoveSound = Sound.verticalMoveSound.getMediaPlayer();
+    private final MediaPlayer bomberHorizontalMoveSound = Sound.horizontalMoveSound.getMediaPlayer();
+    private final MediaPlayer bomberPutBombSound = Sound.putBombSound.getMediaPlayer();
+    private final MediaPlayer bomberGetItemSound = Sound.getItemSound.getMediaPlayer();
+    private final MediaPlayer bomberKillSound = Sound.killSound.getMediaPlayer();
+    private final MediaPlayer bomberDeadSound = Sound.deadSound.getMediaPlayer();
 
     public Bomber(double x, double y, Image img) {
         super(x, y, img);
@@ -83,19 +95,36 @@ public class Bomber extends Entity {
     public void update() {
         animate++;
         bombList.update();
+        updateSound();
 
         if (status == BOMBER_STATUS.SPAWN) {
-            if (animate >= 90) status = BOMBER_STATUS.ACTIVE;
+            if (animate >= 60) status = BOMBER_STATUS.ACTIVE;
         }
         if (status == BOMBER_STATUS.ACTIVE || status == BOMBER_STATUS.SPAWN) {
             double speed = 0.8 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
-            if (move.up) y -= speed * speedItemBuff;
-            if (move.down) y += speed * speedItemBuff;
-            if (move.left) x -= speed * speedItemBuff;
-            if (move.right) x += speed * speedItemBuff;
+            if (move.up) y -= speed * (1 + speedLevel * 0.25);
+            if (move.down) y += speed * (1 + speedLevel * 0.25);
+            if (move.left) x -= speed * (1 + speedLevel * 0.25);
+            if (move.right) x += speed * (1 + speedLevel * 0.25);
         } else if (status == BOMBER_STATUS.KILLED) {
             if (animate >= 24) respawn();
         }
+    }
+
+    public void updateSound() {
+        if (move.left || move.right) Sound.playSoundLoop(bomberHorizontalMoveSound, 200);
+        else bomberHorizontalMoveSound.stop();
+        if (move.up || move.down) Sound.playSoundLoop(bomberVerticalMoveSound, 200);
+        else bomberVerticalMoveSound.stop();
+    }
+
+    public void stopSound() {
+        bomberHorizontalMoveSound.stop();
+        bomberVerticalMoveSound.stop();
+        bomberPutBombSound.stop();
+        bomberGetItemSound.stop();
+        bomberKillSound.stop();
+        bomberDeadSound.stop();
     }
 
     /**
@@ -106,7 +135,7 @@ public class Bomber extends Entity {
         if (status == BOMBER_STATUS.ACTIVE) {
             if (other instanceof Enemy) {
                 Enemy enemy = (Enemy) other;
-                if (((Enemy) other).getStatus() == Enemy.ENEMY_STATUS.ACTIVE) kill();
+                if (enemy.getStatus() == Enemy.ENEMY_STATUS.ACTIVE) kill();
             }
             if (other instanceof Flame) {
                 Flame fl = (Flame) other;
@@ -135,6 +164,8 @@ public class Bomber extends Entity {
     public void kill() {
         status = BOMBER_STATUS.KILLED;
         animate = 0;
+
+        Sound.playSound(bomberKillSound, 600);
     }
 
     /**
@@ -154,8 +185,8 @@ public class Bomber extends Entity {
         x = Sprite.SCALED_SIZE;
         y = Sprite.SCALED_SIZE;
 
-        lives--;
-//        if (lives == 0) dead();
+        life--;
+        if (life < 0) dead();
     }
 
     /**
@@ -163,8 +194,8 @@ public class Bomber extends Entity {
      */
     public void dead() {
         status = BOMBER_STATUS.DEAD;
-        //TODO
-        System.exit(0);
+
+        bomberDeadSound.play();
     }
 
     /**
@@ -176,6 +207,8 @@ public class Bomber extends Entity {
             int xUnit = (int) Math.round(x / Sprite.SCALED_SIZE);
             int yUnit = (int) Math.round(y / Sprite.SCALED_SIZE);
             bombList.addBomb(xUnit, yUnit, bombLength);
+
+            Sound.playSound(bomberPutBombSound, 200);
         }
     }
 
@@ -185,5 +218,53 @@ public class Bomber extends Entity {
 
     public List<Flame> getFlameList() {
         return bombList.getFlameList();
+    }
+
+    public BOMBER_STATUS getStatus() {
+        return status;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    public int getSpeedLevel() {
+        return speedLevel;
+    }
+
+    public int getBombLength() {
+        return bombLength;
+    }
+
+    public int getMaxBomb() {
+        return maxBomb;
+    }
+
+    public void setStatus(BOMBER_STATUS status) {
+        this.status = status;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+
+    public void setSpeedLevel(int speedLevel) {
+        this.speedLevel = speedLevel;
+    }
+
+    public void setBombLength(int bombLength) {
+        this.bombLength = bombLength;
+    }
+
+    public void setMaxBomb(int maxBomb) {
+        this.maxBomb = maxBomb;
     }
 }

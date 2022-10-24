@@ -9,6 +9,7 @@ import uet.oop.bomberman.graphics.Sprite;
 public class Balloom extends RandomEnemy {
     public Balloom(double x, double y) {
         super(x, y);
+        score = 100;
     }
 
     @Override
