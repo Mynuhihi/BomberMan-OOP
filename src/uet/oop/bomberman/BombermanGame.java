@@ -15,7 +15,7 @@ public class BombermanGame extends Application {
     public static final double STAGE_HEIGHT = 675;
     public static int HIGH_SCORE = 0;
     public static int CURRENT_LEVEL = 1;
-    public static int MAX_LEVEL = 4;
+    public static int MAX_LEVEL = 5;
 
     private static Scenes currentScene = new MenuScene(new Group());
 
