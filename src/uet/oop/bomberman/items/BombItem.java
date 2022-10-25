@@ -9,8 +9,4 @@ public class BombItem extends Item{
         super(xUnit, yUnit, img);
     }
 
-    @Override
-    public void render(GraphicsContext gc) {
-        super.render(gc);
-    }
 }

@@ -2,6 +2,7 @@ package uet.oop.bomberman.items;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import uet.oop.bomberman.entities.Bomber;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.scene.GameScene;
@@ -11,14 +12,17 @@ public class Item extends Entity {
         BRICK, ITEM, DELETE
     }
 
-    public ITEM_STATUS status = ITEM_STATUS.BRICK;
+    private ITEM_STATUS status = ITEM_STATUS.BRICK;
 
     public Item(double xUnit, double yUnit, Image img) {
-        super(xUnit, yUnit, null);
+        super(xUnit, yUnit, img);
     }
 
     @Override
     public void update() {
+        if (status == ITEM_STATUS.DELETE) {
+            return;
+        }
         if (!GameScene.getMap().containsKey((int) (x), (int) (y))) {
             status = ITEM_STATUS.ITEM;
         }
@@ -33,6 +37,7 @@ public class Item extends Entity {
 
     public void detele() {
         status = ITEM_STATUS.DELETE;
+
     }
     public ITEM_STATUS getStatus() {
         return status;
@@ -40,7 +45,10 @@ public class Item extends Entity {
 
     @Override
     public void handleCollision(Entity other) {
-
+        if (other instanceof Bomber && status == ITEM_STATUS.ITEM) {
+            detele();
+        }
     }
+
 
 }

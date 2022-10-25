@@ -5,14 +5,16 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import uet.oop.bomberman.entities.bomb.Bomb;
 import uet.oop.bomberman.entities.bomb.BombList;
 import uet.oop.bomberman.entities.bomb.Flame;
 import uet.oop.bomberman.entities.enemy.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.items.BombItem;
+import uet.oop.bomberman.items.FlameItem;
+import uet.oop.bomberman.items.Item;
+import uet.oop.bomberman.items.SpeedItem;
 import uet.oop.bomberman.sounds.Sound;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class Bomber extends Entity {
 
     private int score = 0;
     private int life = 2;
-    private int speedLevel = 0;
+    private double speedLevel = 0;
     private int bombLength = 1;
     private int maxBomb = 1;
 
@@ -141,6 +143,24 @@ public class Bomber extends Entity {
                 Flame fl = (Flame) other;
                 if (fl.getStatus() == Flame.FLAME_STATUS.ACTIVE) kill();
             }
+            if (other instanceof BombItem) {
+                BombItem bt = (BombItem) other;
+                if (bt.getStatus() == Item.ITEM_STATUS.DELETE) {
+                    maxBomb++;
+                }
+            }
+            if (other instanceof FlameItem) {
+                FlameItem ft = (FlameItem) other;
+                if (ft.getStatus() == Item.ITEM_STATUS.ITEM) {
+                    bombLength++;
+                }
+            }
+            if (other instanceof SpeedItem) {
+                SpeedItem st = (SpeedItem) other;
+                if (st.getStatus() == Item.ITEM_STATUS.DELETE) {
+                    speedLevel += 0.1;
+                }
+            }
         }
     }
 
@@ -232,7 +252,7 @@ public class Bomber extends Entity {
         return life;
     }
 
-    public int getSpeedLevel() {
+    public double getSpeedLevel() {
         return speedLevel;
     }
 
@@ -256,7 +276,7 @@ public class Bomber extends Entity {
         this.life = life;
     }
 
-    public void setSpeedLevel(int speedLevel) {
+    public void setSpeedLevel(double speedLevel) {
         this.speedLevel = speedLevel;
     }
 

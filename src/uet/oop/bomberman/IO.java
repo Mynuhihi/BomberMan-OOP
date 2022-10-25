@@ -22,7 +22,7 @@ public class IO {
         return data;
     }
 
-    public static void writeToBomberFile(int score, int life, int speedLevel, int bombLength, int maxBomb) {
+    public static void writeToBomberFile(int score, int life, double speedLevel, int bombLength, int maxBomb) {
         try {
             FileWriter out = new FileWriter("res/data/bomber.txt");
             out.write(score + " ");
@@ -46,7 +46,7 @@ public class IO {
             Scanner scanner = new Scanner(reader);
             b.setScore(scanner.nextInt());
             b.setLife(scanner.nextInt());
-            b.setSpeedLevel(scanner.nextInt());
+            b.setSpeedLevel(scanner.nextDouble());
             b.setBombLength(scanner.nextInt());
             b.setMaxBomb(scanner.nextInt());
             reader.close();

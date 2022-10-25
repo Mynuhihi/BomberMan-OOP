@@ -18,7 +18,9 @@ import uet.oop.bomberman.entities.map.*;
 import uet.oop.bomberman.entities.map.Map;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.items.BombItem;
+import uet.oop.bomberman.items.FlameItem;
 import uet.oop.bomberman.items.Item;
+import uet.oop.bomberman.items.SpeedItem;
 import uet.oop.bomberman.sounds.Sound;
 
 import java.io.*;
@@ -118,6 +120,12 @@ public class GameScene extends Scenes {
                 } else if (line.charAt(j) == 'b') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
                     itemList.add(new BombItem(j, i, Sprite.powerup_bombs.getFxImage()));
+                } else if (line.charAt(j) == 'f') {
+                    map.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    itemList.add(new FlameItem(j, i, Sprite.powerup_flames.getFxImage()));
+                } else if (line.charAt(j) == 's') {
+                    map.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    itemList.add(new SpeedItem(j, i, Sprite.powerup_speed.getFxImage()));
                 }
             }
         }
@@ -154,6 +162,12 @@ public class GameScene extends Scenes {
                 fl.checkCollision(b, false);
             }
             bomber.checkCollision(fl, false);
+        }
+        for (Item item : itemList) {
+            bomber.checkCollision(item, false);
+            for (Enemy enemy : enemyList) {
+                item.checkCollision(enemy, true);
+            }
         }
     }
 
@@ -199,10 +213,11 @@ public class GameScene extends Scenes {
         gc.setFill(Color.rgb(80, 160, 0));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
+        itemList.forEach(g -> g.render(gc));
         map.render(gc);
         bomber.render(gc);
         enemyList.forEach(g -> g.render(gc));
-        itemList.forEach(g -> g.render(gc));
+
         renderScoreboard();
     }
 
