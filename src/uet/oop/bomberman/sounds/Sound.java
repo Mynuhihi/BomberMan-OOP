@@ -39,7 +39,8 @@ public class Sound {
         return new MediaPlayer(media);
     }
 
-    public static void playSound(MediaPlayer player, int millis) {
+    public static void playSound(MediaPlayer player, int millis, double volume) {
+        player.setVolume(volume);
         player.play();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -50,9 +51,10 @@ public class Sound {
         }, millis);
     }
 
-    public static void playSoundLoop(MediaPlayer player, int millis) {
+    public static void playSoundLoop(MediaPlayer player, int millis, double volume) {
         player.setCycleCount(MediaPlayer.INDEFINITE);
         player.setStopTime(Duration.millis(millis));
+        player.setVolume(volume);
         player.play();
     }
 }

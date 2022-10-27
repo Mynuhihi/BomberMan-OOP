@@ -25,7 +25,7 @@ public class Brick extends MapEntity {
         if (status == BRICK_STATUS.ACTIVE) {
             gc.drawImage(img, x, y);
         } else if (status == BRICK_STATUS.BROKEN) {
-            img = Sprite.movingSprite(Sprite.brick_exploded, Sprite.brick_exploded1, Sprite.brick_exploded2, animate, BROKEN_ANIMATE_TIME).getFxImage();
+            img = Sprite.movingSprite(Sprite.brick_exploded1, Sprite.brick_exploded2, Sprite.brick_exploded3, Sprite.brick_exploded4, Sprite.brick_exploded5, animate, BROKEN_ANIMATE_TIME).getFxImage();
             gc.drawImage(img, x, y);
         }
     }
@@ -51,7 +51,6 @@ public class Brick extends MapEntity {
 
     public void delete() {
         status = BRICK_STATUS.DELETED;
-        img = null;
     }
 
     public BRICK_STATUS getStatus() {

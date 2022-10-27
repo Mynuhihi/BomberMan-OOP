@@ -19,8 +19,6 @@ public class WinScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
-    private Timer timer = new Timer();
-    private MediaPlayer mediaPlayer = Sound.winSound.getMediaPlayer();
 
     public WinScene(Group root) {
         super(root);
@@ -29,8 +27,11 @@ public class WinScene extends Scenes {
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        MediaPlayer mediaPlayer = Sound.winSound.getMediaPlayer();
+        mediaPlayer.setVolume(0.1);
         mediaPlayer.play();
 
+        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -47,7 +48,7 @@ public class WinScene extends Scenes {
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         for (int i = 0; i < 15; i++) {
-            gc.drawImage(Sprite.brick_exploded.getFxImage(), Sprite.SCALED_SIZE * i, BombermanGame.STAGE_HEIGHT * 4 / 5);
+            gc.drawImage(Sprite.brick_exploded1.getFxImage(), Sprite.SCALED_SIZE * i, BombermanGame.STAGE_HEIGHT * 4 / 5);
         }
 
         int y = 28;

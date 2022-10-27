@@ -25,10 +25,6 @@ public class Flame extends Entity {
         this.type = type;
     }
 
-    /**
-     * Set img phu thuoc vao loai flame (FLAME_TYPE)
-     * Neu flame da duoc kich hoat (ACTIVE) thi moi render.
-     */
     @Override
     public void render(GraphicsContext gc) {
         if (type == FLAME_TYPE.CENTER)
@@ -45,12 +41,15 @@ public class Flame extends Entity {
             img = Sprite.movingSprite(Sprite.explosion_horizontal_left_last, Sprite.explosion_horizontal_left_last1, Sprite.explosion_horizontal_left_last2, Sprite.explosion_horizontal_left_last1, Sprite.explosion_horizontal_left_last, animate, ANIMATE_TIME).getFxImage();
         if (type == FLAME_TYPE.RIGHT)
             img = Sprite.movingSprite(Sprite.explosion_horizontal_right_last, Sprite.explosion_horizontal_right_last1, Sprite.explosion_horizontal_right_last2, Sprite.explosion_horizontal_right_last1, Sprite.explosion_horizontal_right_last, animate, ANIMATE_TIME).getFxImage();
-        if (status == FLAME_STATUS.ACTIVE) super.render(gc);
+        if (status == FLAME_STATUS.ACTIVE) {
+            animate++;
+            super.render(gc);
+        }
     }
 
     @Override
     public void update() {
-        if (status == FLAME_STATUS.ACTIVE) animate++;
+
     }
 
     @Override

@@ -17,10 +17,10 @@ import uet.oop.bomberman.entities.enemy.randomEnemy.*;
 import uet.oop.bomberman.entities.map.*;
 import uet.oop.bomberman.entities.map.Map;
 import uet.oop.bomberman.graphics.Sprite;
-import uet.oop.bomberman.items.BombItem;
-import uet.oop.bomberman.items.FlameItem;
-import uet.oop.bomberman.items.Item;
-import uet.oop.bomberman.items.SpeedItem;
+import uet.oop.bomberman.entities.items.BombItem;
+import uet.oop.bomberman.entities.items.FlameItem;
+import uet.oop.bomberman.entities.items.Item;
+import uet.oop.bomberman.entities.items.SpeedItem;
 import uet.oop.bomberman.sounds.Sound;
 
 import java.io.*;
@@ -39,9 +39,10 @@ public class GameScene extends Scenes {
     private static List<Enemy> enemyList = new ArrayList<>();
     private static List<Item> itemList = new ArrayList<>();
     private static Map map = new Map();
+    private static Portal portal;
 
-    private Timer timer = new Timer();
     private int time = 200;
+    private boolean isStopped = false;
 
     private MediaPlayer soundtrack = Sound.gameSound.getMediaPlayer();
 
@@ -49,6 +50,7 @@ public class GameScene extends Scenes {
         super(root);
         enemyList = new ArrayList<>();
         map = new Map();
+        itemList = new ArrayList<>();
 
         try {
             String level = getLevelPath();
@@ -65,23 +67,28 @@ public class GameScene extends Scenes {
         root.getChildren().addAll(canvas, scoreboard);
 
         bomber.addControl(this);
-        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
-                soundtrack.stop();
-                bomber.stopSound();
-                BombermanGame.setScene(new MenuScene(new Group()));
+                if (!isStopped) {
+                    soundtrack.stop();
+                    bomber.stopSound();
+                    BombermanGame.setScene(new MenuScene(new Group()));
+                }
             }
         });
 
         this.setCamera(camera);
 
+        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 time--;
+                if (time == 0) timer.cancel();
             }
         }, 1000, 1000);
 
+        soundtrack.setVolume(0.1);
         soundtrack.play();
     }
 
@@ -126,6 +133,9 @@ public class GameScene extends Scenes {
                 } else if (line.charAt(j) == 's') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
                     itemList.add(new SpeedItem(j, i, Sprite.powerup_speed.getFxImage()));
+                } else if (line.charAt(j) == 'x') {
+                    map.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                    portal = new Portal(j, i, Sprite.portal.getFxImage());
                 }
             }
         }
@@ -145,6 +155,7 @@ public class GameScene extends Scenes {
                 }
             }
             bomber.checkCollision(e, false);
+            portal.checkCollision(e, !(e instanceof BrickPass));
         }
         // Kiem tra va cham all brick/wall voi bomber.txt
         for (Entity entity : map.getMap()) {
@@ -166,17 +177,14 @@ public class GameScene extends Scenes {
         for (Item item : itemList) {
             bomber.checkCollision(item, false);
             for (Enemy enemy : enemyList) {
-                item.checkCollision(enemy, true);
+                item.checkCollision(enemy, !(enemy instanceof BrickPass));
             }
         }
     }
 
     public void update() {
-        if (time == 0) timer.cancel();
-
         map.update();
         bomber.update();
-        if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) gameOver();
 
         Iterator<Enemy> it = enemyList.iterator();
         while (it.hasNext()) {
@@ -184,10 +192,14 @@ public class GameScene extends Scenes {
             if (e.getStatus() == Enemy.ENEMY_STATUS.DELETED) it.remove();
             e.update();
         }
-        if (enemyList.size() == 0) nextLevel();
-        for (Item item: itemList) {
-            item.update();
+
+        Iterator<Item> iit = itemList.iterator();
+        while (iit.hasNext()) {
+            Item i = iit.next();
+            if (i.getStatus() == Item.ITEM_STATUS.DELETED) iit.remove();
+            i.update();
         }
+
         updateCamera();
         updateScoreboard();
     }
@@ -210,9 +222,10 @@ public class GameScene extends Scenes {
     }
 
     public void render() {
-        gc.setFill(Color.rgb(80, 160, 0));
+        gc.setFill(Color.rgb(56, 135, 0));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
+        portal.render(gc);
         itemList.forEach(g -> g.render(gc));
         map.render(gc);
         bomber.render(gc);
@@ -234,45 +247,62 @@ public class GameScene extends Scenes {
         }
     }
 
-    public static Bomber getBomber() {
-        return bomber;
-    }
-
-    public static Map getMap() {
-        return map;
-    }
-
-    public static int getScore() {
-        return bomber.getScore();
-    }
-
-    public static void addScore(int score) {
-        bomber.setScore(bomber.getScore() + score);
-    }
-
     @Override
     public void show() {
-        render();
-        update();
-        checkAllCollisions();
+        if (!isStopped) {
+            render();
+            update();
+            checkAllCollisions();
+
+            if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) gameOver();
+            if (enemyList.size() == 0 && isBomberInPortal()) nextLevel();
+        }
+    }
+
+    public boolean isBomberInPortal() {
+        double bomberXCenter = bomber.getX() + 18;
+        double bomberYCenter = bomber.getY() + 18;
+        double portalXCenter = portal.getX() + 24;
+        double portalYCenter = portal.getY() + 24;
+        double distance = Math.sqrt(Math.pow(bomberXCenter - portalXCenter, 2) + Math.pow(bomberYCenter - portalYCenter, 2));
+        return distance < Sprite.SCALED_SIZE / 4.0;
     }
 
     public void nextLevel() {
         try {
+            isStopped = true;
             bomber.stopSound();
             soundtrack.stop();
+
+            MediaPlayer portalSound = Sound.nextLevelSound.getMediaPlayer();
+            Sound.playSound(portalSound, 3000, 0.1);
+
             if (bomber.getScore() > BombermanGame.HIGH_SCORE) {
                 BombermanGame.HIGH_SCORE = bomber.getScore();
                 IO.writeToFile(bomber.getScore(), "res/data/highscore.txt");
             }
             if (BombermanGame.CURRENT_LEVEL == BombermanGame.MAX_LEVEL) {
                 IO.writeBomberData(bomber);
-                BombermanGame.setScene(new WinScene(new Group()));
+
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        BombermanGame.setScene(new WinScene(new Group()));
+                    }
+                }, 3000);
             } else {
                 BombermanGame.CURRENT_LEVEL++;
                 IO.writeToFile(BombermanGame.CURRENT_LEVEL, "res/data/curlevel.txt");
                 IO.writeBomberData(bomber);
-                BombermanGame.setScene(new LevelScene(new Group()));
+
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        BombermanGame.setScene(new LevelScene(new Group()));
+                    }
+                }, 3000);
             }
         } catch (IOException e) {
             System.exit(1);
@@ -281,14 +311,27 @@ public class GameScene extends Scenes {
 
     public void gameOver() {
         try {
+            isStopped = true;
             bomber.stopSound();
             soundtrack.stop();
+
+            MediaPlayer bomberDeadSound = Sound.deadSound.getMediaPlayer();
+            Sound.playSound(bomberDeadSound, 3000, 0.1);
+
             if (bomber.getScore() > BombermanGame.HIGH_SCORE) {
                 BombermanGame.HIGH_SCORE = bomber.getScore();
                 IO.writeToFile(bomber.getScore(), "res/data/highscore.txt");
             }
             IO.newGame();
-            BombermanGame.setScene(new GameOverScene(new Group()));
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    timer.cancel();
+                    BombermanGame.setScene(new GameOverScene(new Group()));
+                }
+            }, 3000);
         } catch (IOException e) {
             System.exit(1);
         }
@@ -298,5 +341,29 @@ public class GameScene extends Scenes {
         if (1 <= BombermanGame.CURRENT_LEVEL && BombermanGame.CURRENT_LEVEL <= BombermanGame.MAX_LEVEL) {
             return "res/levels/Level" + BombermanGame.CURRENT_LEVEL + ".txt";
         } else return null;
+    }
+
+    public static Bomber getBomber() {
+        return bomber;
+    }
+
+    public static Map getMap() {
+        return map;
+    }
+
+    public static Portal getPortal() {
+        return portal;
+    }
+
+    public static List<Enemy> getEnemyList() {
+        return enemyList;
+    }
+
+    public static int getScore() {
+        return bomber.getScore();
+    }
+
+    public static void addScore(int score) {
+        bomber.setScore(bomber.getScore() + score);
     }
 }

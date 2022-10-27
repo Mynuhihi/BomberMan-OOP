@@ -25,7 +25,7 @@ public class Ovape extends RandomEnemy implements BrickPass {
                 img = Sprite.movingSprite(Sprite.ovape_right1, Sprite.ovape_right2, Sprite.ovape_right3, Sprite.ovape_right2, animate, ANIMATE_TIME).getFxImage();
             super.render(gc);
         } else if (status == Enemy.ENEMY_STATUS.KILLED) {
-            img = Sprite.movingSprite(Sprite.ovape_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, animate, KILL_TIME).getFxImage();
+            img = Sprite.movingSprite(Sprite.ovape_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, Sprite.mob_dead4, animate, KILL_TIME).getFxImage();
             super.render(gc);
         }
     }

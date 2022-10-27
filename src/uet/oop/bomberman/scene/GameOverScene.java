@@ -18,8 +18,6 @@ public class GameOverScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
-    private Timer timer = new Timer();
-    private MediaPlayer mediaPlayer = Sound.gameOverSound.getMediaPlayer();
 
     public GameOverScene(Group root) {
         super(root);
@@ -28,8 +26,11 @@ public class GameOverScene extends Scenes {
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        MediaPlayer mediaPlayer = Sound.gameOverSound.getMediaPlayer();
+        mediaPlayer.setVolume(0.1);
         mediaPlayer.play();
 
+        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
