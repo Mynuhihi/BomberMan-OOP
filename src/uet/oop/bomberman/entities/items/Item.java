@@ -40,6 +40,8 @@ public class Item extends Entity {
     public void delete() {
         MediaPlayer mediaPlayer = Sound.getItemSound.getMediaPlayer();
         Sound.playSound(mediaPlayer, 200, 0.1);
+        MediaPlayer powerUpSound = Sound.powerUpSound.getMediaPlayer();
+        GameScene.setSoundtrack(powerUpSound);
         status = ITEM_STATUS.DELETED;
     }
 

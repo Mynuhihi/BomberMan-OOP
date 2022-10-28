@@ -79,7 +79,7 @@ public class Bomber extends Entity {
                 img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, animate, 18).getFxImage();
             gc.drawImage(img, x, y);
         } else if (status == BOMBER_STATUS.KILLED) {
-            img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, animate, 24).getFxImage();
+            img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, Sprite.blank, animate, 32).getFxImage();
             gc.drawImage(img, x, y);
         }
     }
@@ -99,7 +99,7 @@ public class Bomber extends Entity {
             if (move.left) x -= speed * (1 + speedLevel * 0.2);
             if (move.right) x += speed * (1 + speedLevel * 0.2);
         } else if (status == BOMBER_STATUS.KILLED) {
-            if (animate >= 24) respawn();
+            if (animate >= 31) respawn();
         }
     }
 
@@ -174,14 +174,13 @@ public class Bomber extends Entity {
     }
 
     public void respawn() {
-        status = BOMBER_STATUS.SPAWN;
-        animate = 0;
-
         life--;
         if (life < 0) dead();
         else {
             x = Sprite.SCALED_SIZE;
             y = Sprite.SCALED_SIZE;
+            status = BOMBER_STATUS.SPAWN;
+            animate = 0;
         }
     }
 

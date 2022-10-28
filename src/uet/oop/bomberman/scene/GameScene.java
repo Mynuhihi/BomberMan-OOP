@@ -37,29 +37,18 @@ public class GameScene extends Scenes {
 
     private static Bomber bomber;
     private static List<Enemy> enemyList = new ArrayList<>();
-    private static List<Item> itemList = new ArrayList<>();
     private static Map map = new Map();
+    private static Item item;
     private static Portal portal;
 
     private int time = 200;
     private boolean isStopped = false;
 
-    private MediaPlayer soundtrack = Sound.gameSound.getMediaPlayer();
+    private static MediaPlayer soundtrack;
 
     public GameScene(Group root) {
         super(root);
-        enemyList = new ArrayList<>();
-        map = new Map();
-        itemList = new ArrayList<>();
-
-        try {
-            String level = getLevelPath();
-            createMap(level);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        IO.readBomberData(bomber);
+        init();
 
         canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         gc = canvas.getGraphicsContext2D();
@@ -88,6 +77,24 @@ public class GameScene extends Scenes {
             }
         }, 1000, 1000);
 
+
+    }
+
+    private void init() {
+        enemyList = new ArrayList<>();
+        map = new Map();
+        portal = null;
+        item = null;
+
+        try {
+            String level = getLevelPath();
+            createMap(level);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        IO.readBomberData(bomber);
+
+        soundtrack = Sound.gameSound.getMediaPlayer();
         soundtrack.setVolume(0.1);
         soundtrack.play();
     }
@@ -126,13 +133,13 @@ public class GameScene extends Scenes {
                     enemyList.add(new Ovape(j, i));
                 } else if (line.charAt(j) == 'b') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
-                    itemList.add(new BombItem(j, i, Sprite.powerup_bombs.getFxImage()));
+                    item = new BombItem(j, i, Sprite.powerup_bombs.getFxImage());
                 } else if (line.charAt(j) == 'f') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
-                    itemList.add(new FlameItem(j, i, Sprite.powerup_flames.getFxImage()));
+                    item = new FlameItem(j, i, Sprite.powerup_flames.getFxImage());
                 } else if (line.charAt(j) == 's') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
-                    itemList.add(new SpeedItem(j, i, Sprite.powerup_speed.getFxImage()));
+                    item = new SpeedItem(j, i, Sprite.powerup_speed.getFxImage());
                 } else if (line.charAt(j) == 'x') {
                     map.add(new Brick(j, i, Sprite.brick.getFxImage()));
                     portal = new Portal(j, i, Sprite.portal.getFxImage());
@@ -155,6 +162,7 @@ public class GameScene extends Scenes {
                 }
             }
             bomber.checkCollision(e, false);
+            item.checkCollision(e, !(e instanceof BrickPass));
             portal.checkCollision(e, !(e instanceof BrickPass));
         }
         // Kiem tra va cham all brick/wall voi bomber.txt
@@ -174,12 +182,7 @@ public class GameScene extends Scenes {
             }
             bomber.checkCollision(fl, false);
         }
-        for (Item item : itemList) {
-            bomber.checkCollision(item, false);
-            for (Enemy enemy : enemyList) {
-                item.checkCollision(enemy, !(enemy instanceof BrickPass));
-            }
-        }
+        bomber.checkCollision(item, false);
     }
 
     public void update() {
@@ -193,12 +196,7 @@ public class GameScene extends Scenes {
             e.update();
         }
 
-        Iterator<Item> iit = itemList.iterator();
-        while (iit.hasNext()) {
-            Item i = iit.next();
-            if (i.getStatus() == Item.ITEM_STATUS.DELETED) iit.remove();
-            i.update();
-        }
+        item.update();
 
         updateCamera();
         updateScoreboard();
@@ -226,7 +224,7 @@ public class GameScene extends Scenes {
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         portal.render(gc);
-        itemList.forEach(g -> g.render(gc));
+        item.render(gc);
         map.render(gc);
         bomber.render(gc);
         enemyList.forEach(g -> g.render(gc));
@@ -365,5 +363,12 @@ public class GameScene extends Scenes {
 
     public static void addScore(int score) {
         bomber.setScore(bomber.getScore() + score);
+    }
+
+    public static void setSoundtrack(MediaPlayer player) {
+        soundtrack.stop();
+        soundtrack = player;
+        soundtrack.setVolume(0.1);
+        soundtrack.play();
     }
 }
