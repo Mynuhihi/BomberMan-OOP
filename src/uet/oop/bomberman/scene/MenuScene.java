@@ -25,7 +25,6 @@ public class MenuScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
-    private MediaPlayer mediaPlayer = Sound.menuSound.getMediaPlayer();
 
     public MenuScene(Group root) {
         super(root);
@@ -34,10 +33,16 @@ public class MenuScene extends Scenes {
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        MediaPlayer mediaPlayer = Sound.menuSound.getMediaPlayer();
+        mediaPlayer.setVolume(0.1);
         mediaPlayer.play();
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE) buttonPress();
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE) {
+                if (currentButton == MENU_BUTTON.START) IO.newGame();
+                mediaPlayer.stop();
+                BombermanGame.setScene(new LevelScene(new Group()));
+            }
             if (event.getCode() == KeyCode.A) currentButton = MENU_BUTTON.START;
             if (event.getCode() == KeyCode.D) currentButton = MENU_BUTTON.CONTINUE;
         });
@@ -71,13 +76,5 @@ public class MenuScene extends Scenes {
         } catch (FileNotFoundException e) {
             System.exit(1);
         }
-    }
-
-    public void buttonPress() {
-        if (currentButton == MENU_BUTTON.START) {
-            IO.newGame();
-        }
-        mediaPlayer.stop();
-        BombermanGame.setScene(new LevelScene(new Group()));
     }
 }

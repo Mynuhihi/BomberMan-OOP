@@ -11,11 +11,6 @@ public abstract class Entity {
     protected double y;
     protected double width;
     protected double height;
-/*    protected boolean remove = false;
-    public boolean isRemove() {
-        return remove;
-    }*/
-
     protected Image img;
 
     //Khởi tạo đối tượng, chuyển từ tọa độ đơn vị sang tọa độ trong canvas
@@ -28,7 +23,7 @@ public abstract class Entity {
     }
 
     public Entity() {
-
+        this(0, 0, null);
     }
 
     public void render(GraphicsContext gc) {

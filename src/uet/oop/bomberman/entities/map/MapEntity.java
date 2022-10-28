@@ -5,9 +5,6 @@ import javafx.scene.image.Image;
 import uet.oop.bomberman.entities.Entity;
 
 public abstract class MapEntity extends Entity {
-    public MapEntity() {
-
-    }
     public MapEntity(double xUnit, double yUnit, Image img) {
         super(xUnit, yUnit, img);
     }

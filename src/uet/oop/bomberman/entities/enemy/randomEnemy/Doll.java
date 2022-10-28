@@ -26,7 +26,7 @@ public class Doll extends RandomEnemy {
                 img = Sprite.movingSprite(Sprite.doll_right1, Sprite.doll_right2, Sprite.doll_right3, Sprite.doll_right2, animate, ANIMATE_TIME).getFxImage();
             super.render(gc);
         } else if (status == Enemy.ENEMY_STATUS.KILLED) {
-            img = Sprite.movingSprite(Sprite.doll_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, animate, KILL_TIME).getFxImage();
+            img = Sprite.movingSprite(Sprite.doll_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, Sprite.mob_dead4, animate, KILL_TIME).getFxImage();
             super.render(gc);
         }
     }

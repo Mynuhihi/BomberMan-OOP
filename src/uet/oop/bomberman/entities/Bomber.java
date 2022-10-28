@@ -11,10 +11,11 @@ import uet.oop.bomberman.entities.bomb.BombList;
 import uet.oop.bomberman.entities.bomb.Flame;
 import uet.oop.bomberman.entities.enemy.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
-import uet.oop.bomberman.items.BombItem;
-import uet.oop.bomberman.items.FlameItem;
-import uet.oop.bomberman.items.Item;
-import uet.oop.bomberman.items.SpeedItem;
+import uet.oop.bomberman.entities.items.BombItem;
+import uet.oop.bomberman.entities.items.FlameItem;
+import uet.oop.bomberman.entities.items.Item;
+import uet.oop.bomberman.entities.items.SpeedItem;
+import uet.oop.bomberman.scene.GameScene;
 import uet.oop.bomberman.sounds.Sound;
 
 import java.util.List;
@@ -38,27 +39,23 @@ public class Bomber extends Entity {
 
     private int score = 0;
     private int life = 2;
-    private double speedLevel = 0;
+    private int speedLevel = 0;
     private int bombLength = 1;
     private int maxBomb = 1;
 
     private final MediaPlayer bomberVerticalMoveSound = Sound.verticalMoveSound.getMediaPlayer();
     private final MediaPlayer bomberHorizontalMoveSound = Sound.horizontalMoveSound.getMediaPlayer();
-    private final MediaPlayer bomberPutBombSound = Sound.putBombSound.getMediaPlayer();
     private final MediaPlayer bomberGetItemSound = Sound.getItemSound.getMediaPlayer();
     private final MediaPlayer bomberKillSound = Sound.killSound.getMediaPlayer();
-    private final MediaPlayer bomberDeadSound = Sound.deadSound.getMediaPlayer();
 
     public Bomber(double x, double y, Image img) {
         super(x, y, img);
         width = Sprite.SCALED_SIZE * 0.75;
     }
 
-    /**
-     * render bombList cung voi bomber bomblist khong phu thoc trang thai bomber.
-     */
     @Override
     public void render(GraphicsContext gc) {
+        animate++;
         bombList.render(gc);
         if (status == BOMBER_STATUS.SPAWN) {
             img = Sprite.movingSprite(Sprite.player_right, Sprite.blank, animate, 10).getFxImage();
@@ -82,20 +79,13 @@ public class Bomber extends Entity {
                 img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, animate, 18).getFxImage();
             gc.drawImage(img, x, y);
         } else if (status == BOMBER_STATUS.KILLED) {
-            img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, animate, 24).getFxImage();
+            img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, Sprite.blank, animate, 32).getFxImage();
             gc.drawImage(img, x, y);
         }
     }
 
-    /**
-     * update tuong tu render.
-     * Kiem tra trang thai Bomber:
-     * SPAWN (moi hoi sinh) -> sau 1.5 giay tro ve binh thuong (ACTIVE)
-     * KILLED -> sau 1 thoi gian hoi sinh: goi ham respawn().
-     */
     @Override
     public void update() {
-        animate++;
         bombList.update();
         updateSound();
 
@@ -104,34 +94,29 @@ public class Bomber extends Entity {
         }
         if (status == BOMBER_STATUS.ACTIVE || status == BOMBER_STATUS.SPAWN) {
             double speed = 0.8 * Sprite.SCALED_SIZE / Sprite.DEFAULT_SIZE;
-            if (move.up) y -= speed * (1 + speedLevel * 0.25);
-            if (move.down) y += speed * (1 + speedLevel * 0.25);
-            if (move.left) x -= speed * (1 + speedLevel * 0.25);
-            if (move.right) x += speed * (1 + speedLevel * 0.25);
+            if (move.up) y -= speed * (1 + speedLevel * 0.2);
+            if (move.down) y += speed * (1 + speedLevel * 0.2);
+            if (move.left) x -= speed * (1 + speedLevel * 0.2);
+            if (move.right) x += speed * (1 + speedLevel * 0.2);
         } else if (status == BOMBER_STATUS.KILLED) {
-            if (animate >= 24) respawn();
+            if (animate >= 31) respawn();
         }
     }
 
     public void updateSound() {
-        if (move.left || move.right) Sound.playSoundLoop(bomberHorizontalMoveSound, 200);
+        if (move.left || move.right) Sound.playSoundLoop(bomberHorizontalMoveSound, 200, 0.1);
         else bomberHorizontalMoveSound.stop();
-        if (move.up || move.down) Sound.playSoundLoop(bomberVerticalMoveSound, 200);
+        if (move.up || move.down) Sound.playSoundLoop(bomberVerticalMoveSound, 200, 0.1);
         else bomberVerticalMoveSound.stop();
     }
 
     public void stopSound() {
         bomberHorizontalMoveSound.stop();
         bomberVerticalMoveSound.stop();
-        bomberPutBombSound.stop();
         bomberGetItemSound.stop();
         bomberKillSound.stop();
-        bomberDeadSound.stop();
     }
 
-    /**
-     * Va cham voi Enemy hoac Flame thi bi kill.
-     */
     @Override
     public void handleCollision(Entity other) {
         if (status == BOMBER_STATUS.ACTIVE) {
@@ -145,7 +130,7 @@ public class Bomber extends Entity {
             }
             if (other instanceof BombItem) {
                 BombItem bt = (BombItem) other;
-                if (bt.getStatus() == Item.ITEM_STATUS.DELETE) {
+                if (bt.getStatus() == Item.ITEM_STATUS.ITEM) {
                     maxBomb++;
                 }
             }
@@ -157,8 +142,8 @@ public class Bomber extends Entity {
             }
             if (other instanceof SpeedItem) {
                 SpeedItem st = (SpeedItem) other;
-                if (st.getStatus() == Item.ITEM_STATUS.DELETE) {
-                    speedLevel += 0.1;
+                if (st.getStatus() == Item.ITEM_STATUS.ITEM) {
+                    speedLevel++;
                 }
             }
         }
@@ -185,50 +170,34 @@ public class Bomber extends Entity {
         status = BOMBER_STATUS.KILLED;
         animate = 0;
 
-        Sound.playSound(bomberKillSound, 600);
+        Sound.playSound(bomberKillSound, 600, 0.1);
     }
 
-    /**
-     * Hoi sinh dat lai trang thai va vi tri
-     * Neu het mang thi die.
-     */
     public void respawn() {
-        status = BOMBER_STATUS.SPAWN;
-        animate = 0;
-
-//        int randomX = 1 + (int) (Math.random() * 1000) % 29;
-//        int randomY = 1 + (int) (Math.random() * 1000) % 11;
-//
-//        x = Sprite.SCALED_SIZE * randomX;
-//        y = Sprite.SCALED_SIZE * randomY;
-
-        x = Sprite.SCALED_SIZE;
-        y = Sprite.SCALED_SIZE;
-
         life--;
         if (life < 0) dead();
+        else {
+            x = Sprite.SCALED_SIZE;
+            y = Sprite.SCALED_SIZE;
+            status = BOMBER_STATUS.SPAWN;
+            animate = 0;
+        }
     }
 
-    /**
-     * die.
-     */
     public void dead() {
         status = BOMBER_STATUS.DEAD;
-
-        bomberDeadSound.play();
     }
 
-    /**
-     * Them bom vao bombList neu chua maxBomb
-     * Lam tron vi tri bom.
-     */
     void addBomb() {
         if (bombList.size() < maxBomb) {
             int xUnit = (int) Math.round(x / Sprite.SCALED_SIZE);
             int yUnit = (int) Math.round(y / Sprite.SCALED_SIZE);
-            bombList.addBomb(xUnit, yUnit, bombLength);
+            int xPortal = (int) Math.round(GameScene.getPortal().x / Sprite.SCALED_SIZE);
+            int yPortal = (int) Math.round(GameScene.getPortal().y / Sprite.SCALED_SIZE);
 
-            Sound.playSound(bomberPutBombSound, 200);
+            if (xUnit != xPortal || yUnit != yPortal) {
+                bombList.addBomb(xUnit, yUnit, bombLength);
+            }
         }
     }
 
@@ -252,7 +221,7 @@ public class Bomber extends Entity {
         return life;
     }
 
-    public double getSpeedLevel() {
+    public int getSpeedLevel() {
         return speedLevel;
     }
 
@@ -276,7 +245,7 @@ public class Bomber extends Entity {
         this.life = life;
     }
 
-    public void setSpeedLevel(double speedLevel) {
+    public void setSpeedLevel(int speedLevel) {
         this.speedLevel = speedLevel;
     }
 

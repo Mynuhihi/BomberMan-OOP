@@ -16,7 +16,7 @@ public class Sprite {
 	protected int _realHeight;
 	private SpriteSheet _sheet;
 
-	public static Sprite blank = new Sprite(DEFAULT_SIZE, 15, 15, SpriteSheet.tiles, 16, 16);
+	public static Sprite blank = new Sprite(DEFAULT_SIZE, 4, 1, SpriteSheet.tiles, 16, 16);
 
 	/*
 	|--------------------------------------------------------------------------
@@ -129,6 +129,7 @@ public class Sprite {
 	public static Sprite mob_dead1 = new Sprite(DEFAULT_SIZE, 15, 0, SpriteSheet.tiles, 16, 16);
 	public static Sprite mob_dead2 = new Sprite(DEFAULT_SIZE, 15, 1, SpriteSheet.tiles, 16, 16);
 	public static Sprite mob_dead3 = new Sprite(DEFAULT_SIZE, 15, 2, SpriteSheet.tiles, 16, 16);
+	public static Sprite mob_dead4 = new Sprite(DEFAULT_SIZE, 15, 3, SpriteSheet.tiles, 16, 16);
 	
 	/*
 	|--------------------------------------------------------------------------
@@ -177,9 +178,11 @@ public class Sprite {
 	| Brick FlameSegment
 	|--------------------------------------------------------------------------
 	 */
-	public static Sprite brick_exploded = new Sprite(DEFAULT_SIZE, 7, 1, SpriteSheet.tiles, 16, 16);
-	public static Sprite brick_exploded1 = new Sprite(DEFAULT_SIZE, 7, 2, SpriteSheet.tiles, 16, 16);
-	public static Sprite brick_exploded2 = new Sprite(DEFAULT_SIZE, 7, 3, SpriteSheet.tiles, 16, 16);
+	public static Sprite brick_exploded1 = new Sprite(DEFAULT_SIZE, 8, 0, SpriteSheet.tiles, 16, 16);
+	public static Sprite brick_exploded2 = new Sprite(DEFAULT_SIZE, 8, 1, SpriteSheet.tiles, 16, 16);
+	public static Sprite brick_exploded3 = new Sprite(DEFAULT_SIZE, 8, 2, SpriteSheet.tiles, 16, 16);
+	public static Sprite brick_exploded4 = new Sprite(DEFAULT_SIZE, 8, 3, SpriteSheet.tiles, 16, 16);
+	public static Sprite brick_exploded5 = new Sprite(DEFAULT_SIZE, 8, 4, SpriteSheet.tiles, 16, 16);
 	
 	/*
 	|--------------------------------------------------------------------------

@@ -4,7 +4,6 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import uet.oop.bomberman.BombermanGame;
@@ -19,8 +18,6 @@ public class LevelScene extends Scenes {
     private double scale = BombermanGame.STAGE_WIDTH / 256;
     private GraphicsContext gc;
     private Canvas canvas;
-    private Timer timer = new Timer();
-    private MediaPlayer mediaPlayer = Sound.levelSound.getMediaPlayer();;
 
     public LevelScene(Group root) {
         super(root);
@@ -29,8 +26,11 @@ public class LevelScene extends Scenes {
         gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
+        MediaPlayer mediaPlayer = Sound.levelSound.getMediaPlayer();
+        mediaPlayer.setVolume(0.1);
         mediaPlayer.play();
 
+        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

@@ -1,21 +1,23 @@
 package uet.oop.bomberman.entities.enemy;
 
+import javafx.scene.media.MediaPlayer;
 import uet.oop.bomberman.scene.GameScene;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.entities.bomb.*;
 import uet.oop.bomberman.entities.map.Wall;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.sounds.Sound;
 
 public abstract class Enemy extends Entity {
     protected static final int ANIMATE_TIME = 32;
-    protected static final int KILL_TIME = 120;
+    protected static final int KILL_TIME = 100;
 
     public enum ENEMY_DIRECTION {
         UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT
     }
 
     public enum ENEMY_STATUS {
-        INACTIVE, ACTIVE, KILLED, DELETED
+        ACTIVE, KILLED, DELETED
     }
 
     protected ENEMY_STATUS status = ENEMY_STATUS.ACTIVE;
@@ -90,6 +92,11 @@ public abstract class Enemy extends Entity {
     public void kill() {
         status = ENEMY_STATUS.KILLED;
         animate = 0;
+
+        if (GameScene.getEnemyList().size() == 1) {
+            MediaPlayer mediaPlayer = Sound.killAllEnemySound.getMediaPlayer();
+            Sound.playSound(mediaPlayer, 1000, 0.1);
+        }
     }
 
     public void delete() {

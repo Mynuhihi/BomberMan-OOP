@@ -25,7 +25,7 @@ public class Minvo extends ChaseEnemy {
                 img = Sprite.movingSprite(Sprite.minvo_right1, Sprite.minvo_right2, Sprite.minvo_right1, Sprite.minvo_right3, animate, ANIMATE_TIME).getFxImage();
             super.render(gc);
         } else if (status == ENEMY_STATUS.KILLED) {
-            img = Sprite.movingSprite(Sprite.minvo_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, animate, KILL_TIME).getFxImage();
+            img = Sprite.movingSprite(Sprite.minvo_dead, Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, Sprite.mob_dead4, animate, KILL_TIME).getFxImage();
             super.render(gc);
         }
     }
