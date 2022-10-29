@@ -58,7 +58,7 @@ public class Bomber extends Entity {
         animate++;
         bombList.render(gc);
         if (status == BOMBER_STATUS.SPAWN) {
-            img = Sprite.movingSprite(Sprite.player_right, Sprite.blank, animate, 10).getFxImage();
+            img = Sprite.movingSprite(Sprite.blank, Sprite.player_right, animate, 10).getFxImage();
             if (move.up)
                 img = Sprite.movingSprite(Sprite.player_up_1, Sprite.blank, Sprite.player_up_2, Sprite.blank, animate, 20).getFxImage();
             if (move.down)
@@ -155,14 +155,14 @@ public class Bomber extends Entity {
             if (event.getCode() == KeyCode.S) move.down = true;
             if (event.getCode() == KeyCode.A) move.left = true;
             if (event.getCode() == KeyCode.D) move.right = true;
-            if (event.getCode() == KeyCode.SPACE) addBomb();
+            if (event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.ENTER) addBomb();
         });
         scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyCode.W) move.up = false;
             if (event.getCode() == KeyCode.S) move.down = false;
             if (event.getCode() == KeyCode.A) move.left = false;
             if (event.getCode() == KeyCode.D) move.right = false;
-            if (event.getCode() == KeyCode.R) kill();
+            if (event.getCode() == KeyCode.K) kill();
         });
     }
 

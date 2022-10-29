@@ -43,6 +43,7 @@ public class Item extends Entity {
         MediaPlayer powerUpSound = Sound.powerUpSound.getMediaPlayer();
         GameScene.setSoundtrack(powerUpSound);
         status = ITEM_STATUS.DELETED;
+        GameScene.addScore(1000);
     }
 
     public ITEM_STATUS getStatus() {

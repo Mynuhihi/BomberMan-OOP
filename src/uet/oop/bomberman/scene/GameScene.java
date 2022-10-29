@@ -46,6 +46,8 @@ public class GameScene extends Scenes {
 
     private static MediaPlayer soundtrack;
 
+    private int gm = 99;
+
     public GameScene(Group root) {
         super(root);
         init();
@@ -64,6 +66,12 @@ public class GameScene extends Scenes {
                     BombermanGame.setScene(new MenuScene(new Group()));
                 }
             }
+            if (event.getCode() == KeyCode.C) { gm = 4; }
+            else if (event.getCode() == KeyCode.H && gm == 4) { gm = 3; }
+            else if (event.getCode() == KeyCode.E && gm == 3) { gm = 2; }
+            else if (event.getCode() == KeyCode.A && gm == 2) { gm = 1; }
+            else if (event.getCode() == KeyCode.T && gm == 1) { gm = 0; }
+            else gm = 99;
         });
 
         this.setCamera(camera);
@@ -76,8 +84,6 @@ public class GameScene extends Scenes {
                 if (time == 0) timer.cancel();
             }
         }, 1000, 1000);
-
-
     }
 
     private void init() {
@@ -196,6 +202,7 @@ public class GameScene extends Scenes {
             e.update();
         }
 
+        portal.update();
         item.update();
 
         updateCamera();
@@ -252,6 +259,8 @@ public class GameScene extends Scenes {
             update();
             checkAllCollisions();
 
+            if (gm == 0) devMode();
+
             if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) gameOver();
             if (enemyList.size() == 0 && isBomberInPortal()) nextLevel();
         }
@@ -271,6 +280,7 @@ public class GameScene extends Scenes {
             isStopped = true;
             bomber.stopSound();
             soundtrack.stop();
+            addScore(time * 5);
 
             MediaPlayer portalSound = Sound.nextLevelSound.getMediaPlayer();
             Sound.playSound(portalSound, 3000, 0.1);
@@ -286,6 +296,9 @@ public class GameScene extends Scenes {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        bomber.stopSound();
+                        soundtrack.stop();
+                        timer.cancel();
                         BombermanGame.setScene(new WinScene(new Group()));
                     }
                 }, 3000);
@@ -298,6 +311,9 @@ public class GameScene extends Scenes {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        bomber.stopSound();
+                        soundtrack.stop();
+                        timer.cancel();
                         BombermanGame.setScene(new LevelScene(new Group()));
                     }
                 }, 3000);
@@ -326,6 +342,8 @@ public class GameScene extends Scenes {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    bomber.stopSound();
+                    soundtrack.stop();
                     timer.cancel();
                     BombermanGame.setScene(new GameOverScene(new Group()));
                 }
@@ -353,6 +371,10 @@ public class GameScene extends Scenes {
         return portal;
     }
 
+    public static Item getItem() {
+        return item;
+    }
+
     public static List<Enemy> getEnemyList() {
         return enemyList;
     }
@@ -370,5 +392,12 @@ public class GameScene extends Scenes {
         soundtrack = player;
         soundtrack.setVolume(0.1);
         soundtrack.play();
+    }
+
+    private void devMode() {
+        bomber.setLife(50);
+        bomber.setSpeedLevel(3);
+        bomber.setBombLength(4);
+        bomber.setMaxBomb(4);
     }
 }
