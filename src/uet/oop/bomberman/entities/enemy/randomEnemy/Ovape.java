@@ -8,7 +8,7 @@ import uet.oop.bomberman.graphics.Sprite;
 public class Ovape extends RandomEnemy implements BrickPass {
     public Ovape(double x, double y) {
         super(x, y);
-        speedLevel = 1.5;
+        speedLevel = 1.75;
         changeDirectionTimeMin = 60;
         changeDirectionTimeMax = 180;
         score = 2000;

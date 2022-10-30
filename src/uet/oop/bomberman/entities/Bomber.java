@@ -38,7 +38,7 @@ public class Bomber extends Entity {
     private int animate = 0;
 
     private int score = 0;
-    private int life = 2;
+    private int life = 4;
     private int speedLevel = 0;
     private int bombLength = 1;
     private int maxBomb = 1;
@@ -47,6 +47,8 @@ public class Bomber extends Entity {
     private final MediaPlayer bomberHorizontalMoveSound = Sound.horizontalMoveSound.getMediaPlayer();
     private final MediaPlayer bomberGetItemSound = Sound.getItemSound.getMediaPlayer();
     private final MediaPlayer bomberKillSound = Sound.killSound.getMediaPlayer();
+
+    public boolean g = false;
 
     public Bomber(double x, double y, Image img) {
         super(x, y, img);
@@ -167,6 +169,7 @@ public class Bomber extends Entity {
     }
 
     public void kill() {
+        if (g) return;
         status = BOMBER_STATUS.KILLED;
         animate = 0;
 
@@ -174,9 +177,9 @@ public class Bomber extends Entity {
     }
 
     public void respawn() {
-        life--;
-        if (life < 0) dead();
+        if (life <= 0) dead();
         else {
+            life--;
             x = Sprite.SCALED_SIZE;
             y = Sprite.SCALED_SIZE;
             status = BOMBER_STATUS.SPAWN;

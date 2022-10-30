@@ -8,9 +8,9 @@ public class Minvo extends ChaseEnemy {
         super(x, y);
         normalSpeedLevel = 1.5;
         chasingSpeedLevel = 2;
-        chasingDistance = 8;
+        chasingDistance = 12;
         changeDirectionTimeMin = 60;
-        changeDirectionTimeMax = 120;
+        changeDirectionTimeMax = 180;
         score = 800;
     }
 

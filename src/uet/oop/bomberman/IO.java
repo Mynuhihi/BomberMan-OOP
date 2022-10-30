@@ -59,7 +59,7 @@ public class IO {
         try {
             IO.writeToFile(1, "res/data/curlevel.txt");
             BombermanGame.CURRENT_LEVEL = 1;
-            IO.writeToBomberFile(0, 2, 0, 1, 1);
+            IO.writeToBomberFile(0, 4, 0, 1, 1);
         } catch (IOException e) {
             System.exit(1);
         }

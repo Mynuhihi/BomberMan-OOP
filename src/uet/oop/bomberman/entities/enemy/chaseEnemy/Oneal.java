@@ -6,6 +6,7 @@ import uet.oop.bomberman.graphics.Sprite;
 public class Oneal extends ChaseEnemy {
     public Oneal(double x, double y) {
         super(x, y);
+        chasingDistance = 6;
         changeDirectionTimeMin = 90;
         changeDirectionTimeMax = 210;
         score = 200;

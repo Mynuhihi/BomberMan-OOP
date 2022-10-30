@@ -10,8 +10,8 @@ public class Doll extends RandomEnemy {
     public Doll(double x, double y) {
         super(x, y);
         speedLevel = 1.75;
-        changeDirectionTimeMin = 60;
-        changeDirectionTimeMax = 180;
+        changeDirectionTimeMin = 30;
+        changeDirectionTimeMax = 120;
         score = 400;
     }
 

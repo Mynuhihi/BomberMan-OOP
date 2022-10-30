@@ -47,6 +47,7 @@ public class GameScene extends Scenes {
     private static MediaPlayer soundtrack;
 
     private int gm = 99;
+    private int inf = 99;
 
     public GameScene(Group root) {
         super(root);
@@ -72,6 +73,11 @@ public class GameScene extends Scenes {
             else if (event.getCode() == KeyCode.A && gm == 2) { gm = 1; }
             else if (event.getCode() == KeyCode.T && gm == 1) { gm = 0; }
             else gm = 99;
+
+            if (event.getCode() == KeyCode.G) { inf = 2; }
+            else if (event.getCode() == KeyCode.O && inf == 2) { inf = 1; }
+            else if (event.getCode() == KeyCode.D && inf == 1) { inf = 0; }
+            else inf = 99;
         });
 
         this.setCamera(camera);
@@ -259,7 +265,8 @@ public class GameScene extends Scenes {
             update();
             checkAllCollisions();
 
-            if (gm == 0) devMode();
+            if (gm == 0) cheat();
+            if (inf == 0) god();
 
             if (bomber.getStatus() == Bomber.BOMBER_STATUS.DEAD) gameOver();
             if (enemyList.size() == 0 && isBomberInPortal()) nextLevel();
@@ -280,7 +287,9 @@ public class GameScene extends Scenes {
             isStopped = true;
             bomber.stopSound();
             soundtrack.stop();
+
             addScore(time * 5);
+            addScore(500 * (BombermanGame.CURRENT_LEVEL * BombermanGame.CURRENT_LEVEL - BombermanGame.CURRENT_LEVEL + 1));
 
             MediaPlayer portalSound = Sound.nextLevelSound.getMediaPlayer();
             Sound.playSound(portalSound, 3000, 0.1);
@@ -394,10 +403,14 @@ public class GameScene extends Scenes {
         soundtrack.play();
     }
 
-    private void devMode() {
+    private void cheat() {
         bomber.setLife(50);
         bomber.setSpeedLevel(3);
         bomber.setBombLength(4);
         bomber.setMaxBomb(4);
+    }
+
+    private void god() {
+        bomber.g = true;
     }
 }
